@@ -22,7 +22,8 @@ body{font-family:'Malgun Gothic','맑은 고딕','Segoe UI',sans-serif;backgroun
 .reset-btn:hover{background:rgba(255,255,255,.25)}
 body.edit-mode .reset-btn{display:inline-block}
 .header{background:var(--wh);border-bottom:1px solid var(--bd);padding:20px 32px;display:flex;align-items:center;gap:16px}
-.avatar{width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--wh);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--wh);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
 .header-info h2{font-size:20px;font-weight:600;color:var(--pri)}
 .header-info p{font-size:13px;color:var(--gr);margin-top:2px}
 .tabs{background:var(--wh);border-bottom:2px solid #E0E4E8;padding:0 32px;display:flex;gap:0;overflow-x:auto}
@@ -130,7 +131,7 @@ body.edit-mode .tbl .del-cell{display:table-cell}
 </div>
 
 <div class="header">
-  <div class="avatar">이</div>
+  <div class="avatar"><img src="photo.jpg" alt="이미정" onerror="this.remove();this.parentNode.textContent='이'"></div>
   <div class="header-info">
     <h2>이미정 의원</h2>
     <p>더불어민주당 · 비례대표 · 문화체육관광위원회</p>
