@@ -22,7 +22,7 @@ body{font-family:'Malgun Gothic','맑은 고딕','Segoe UI',sans-serif;backgroun
 .reset-btn:hover{background:rgba(255,255,255,.25)}
 body.edit-mode .reset-btn{display:inline-block}
 .header{background:var(--wh);border-bottom:1px solid var(--bd);padding:20px 32px;display:flex;align-items:center;gap:16px}
-.avatar{width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--wh);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0;overflow:hidden}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--sec);color:var(--wh);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
 .header-info h2{font-size:20px;font-weight:600;color:var(--pri)}
 .header-info p{font-size:13px;color:var(--gr);margin-top:2px}
@@ -31,7 +31,8 @@ body.edit-mode .reset-btn{display:inline-block}
 .tab:hover{color:var(--sec)}
 .tab.active{color:var(--sec);border-bottom-color:var(--sec)}
 .content{max-width:960px;margin:0 auto;padding:24px 32px}
-.panel{display:none}.panel.active{display:block}
+.panel{display:none}
+.panel.active{display:block}
 .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
 .metric{background:var(--wh);border-radius:10px;padding:16px 20px;border:1px solid var(--bd)}
 .metric-label{font-size:12px;color:var(--gr);margin-bottom:4px}
@@ -75,16 +76,16 @@ body.edit-mode .del-btn{display:block}
 .add-btn{display:none;border:2px dashed var(--acc);background:transparent;color:var(--acc);padding:12px;border-radius:10px;width:100%;cursor:pointer;font-size:14px;font-weight:600;margin:8px 0 16px;transition:all .2s}
 .add-btn:hover{background:var(--lbg);border-color:var(--sec)}
 body.edit-mode .add-btn{display:block}
+body.edit-mode .card{cursor:default}
 body.edit-mode .card.dragging{opacity:.4;border:2px dashed var(--acc)}
 body.edit-mode .card.drag-over{border-top:3px solid var(--sec)}
 [contenteditable=true]{outline:none;border-bottom:1px dashed var(--acc);padding:0 2px;min-width:20px}
 [contenteditable=true]:focus{background:var(--lbg2);border-bottom-color:var(--sec)}
 body.edit-mode .tbl td[contenteditable]{border-bottom:1px dashed var(--acc)}
-body.edit-mode .tbl .grip-cell{display:table-cell}
+.tbl .del-cell{display:none;color:var(--red);cursor:pointer;font-size:14px;text-align:center}
 body.edit-mode .tbl .del-cell{display:table-cell}
 .tbl .grip-cell{display:none;cursor:grab;color:var(--gr);font-size:14px;text-align:center}
-.tbl .del-cell{display:none;color:var(--red);cursor:pointer;font-size:14px;text-align:center}
-/* Calendar */
+body.edit-mode .tbl .grip-cell{display:table-cell}
 .cal-wrap{margin-bottom:24px}
 .cal-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
 .cal-nav button{background:var(--wh);border:1px solid var(--bd);border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--pri);display:flex;align-items:center;justify-content:center}
@@ -101,9 +102,7 @@ body.edit-mode .tbl .del-cell{display:table-cell}
 .cal-cell.sun .cal-day{color:#E53935}
 .cal-cell.sat .cal-day{color:var(--sec)}
 .cal-evt{display:block;background:var(--sec);color:var(--wh);font-size:10px;padding:1px 4px;border-radius:3px;margin-bottom:2px;overflow:hidden;cursor:default;line-height:1.4;word-break:break-all}
-.cal-evt.st0{background:var(--acc)}
-.cal-evt.st1{background:#D4A017}
-.cal-evt.st2{background:var(--green)}
+.cal-evt.st0{background:var(--acc)}.cal-evt.st1{background:#D4A017}.cal-evt.st2{background:var(--green)}
 .cal-evt:hover{opacity:.85}
 .cal-more{font-size:10px;color:var(--sec);cursor:pointer;font-weight:500}
 .cal-legend{display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:11px;color:var(--gr)}
@@ -117,11 +116,36 @@ body.edit-mode .tbl .del-cell{display:table-cell}
 .cal-legend2{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;font-size:11px;color:var(--gr)}
 .cal-legend2 span{display:flex;align-items:center;gap:4px}
 .cal-legend2 i{width:10px;height:10px;border-radius:2px;display:inline-block}
-@media(max-width:768px){.metric-row{grid-template-columns:repeat(2,1fr)}.content{padding:16px}.tabs{padding:0 16px}.header{padding:16px}.cal-cell{min-height:60px}}
+.pledge-view-toggle{display:flex;gap:0;margin-bottom:16px}
+.pledge-view-btn{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--wh);color:var(--gr);transition:all .2s}
+.pledge-view-btn:first-child{border-radius:8px 0 0 8px}
+.pledge-view-btn:last-child{border-radius:0 8px 8px 0}
+.pledge-view-btn.active{background:var(--pri);color:var(--wh);border-color:var(--pri)}
+.acc-group{margin-bottom:8px;border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--wh)}
+.acc-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .2s}
+.acc-header:hover{background:var(--lbg2)}
+.acc-header .acc-left{display:flex;align-items:center;gap:8px}
+.acc-header .acc-icon{font-size:18px}
+.acc-header .acc-name{font-size:14px;font-weight:600;color:var(--pri)}
+.acc-header .acc-cnt{font-size:12px;color:var(--gr)}
+.acc-header .acc-right{display:flex;align-items:center;gap:8px}
+.acc-header .acc-ratio{font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px}
+.acc-header .acc-arrow{font-size:14px;color:var(--gr);transition:transform .2s}
+.acc-body{display:none;border-top:1px solid var(--bd);padding:8px 16px}
+.acc-group.open .acc-body{display:block}
+.acc-group.open .acc-arrow{transform:rotate(180deg)}
+.acc-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;border-bottom:1px solid #F0F0F0}
+.acc-item:last-child{border-bottom:none}
+.acc-item .acc-st{width:18px;height:18px;border-radius:50%;border:2px solid var(--bd);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.acc-item .acc-st:hover{transform:scale(1.1)}
+.acc-item .acc-st.s0{border-color:var(--acc);color:transparent}
+.acc-item .acc-st.s1{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
+.acc-item .acc-st.s2{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.pledge-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:768px){.metric-row{grid-template-columns:repeat(2,1fr)}.content{padding:16px}.tabs{padding:0 16px}.header{padding:16px}.cal-cell{min-height:60px}.pledge-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <div class="top-bar">
   <h1>📋 제12대 경기도의회 전반기 의정지원 계획 <span class="period">2026.7 ~ 2028.6</span></h1>
   <div class="top-right">
@@ -129,7 +153,6 @@ body.edit-mode .tbl .del-cell{display:table-cell}
     <label class="edit-toggle"><input type="checkbox" id="editToggle" onchange="toggleEditMode()"><span class="toggle-track"></span>편집 모드</label>
   </div>
 </div>
-
 <div class="header">
   <div class="avatar"><img src="photo.jpg" alt="이미정" onerror="this.remove();this.parentNode.textContent='이'"></div>
   <div class="header-info">
@@ -137,7 +160,6 @@ body.edit-mode .tbl .del-cell{display:table-cell}
     <p>더불어민주당 · 비례대표 · 문화체육관광위원회</p>
   </div>
 </div>
-
 <div class="tabs">
   <div class="tab active" onclick="showTab(0)">📊 대시보드</div>
   <div class="tab" onclick="showTab(1)">🏛️ 문체위 활동</div>
@@ -145,7 +167,6 @@ body.edit-mode .tbl .del-cell{display:table-cell}
   <div class="tab" onclick="showTab(3)">📅 일정표</div>
   <div class="tab" onclick="showTab(4)">👤 프로필</div>
 </div>
-
 <div class="content">
   <div class="panel active" id="panel-0"></div>
   <div class="panel" id="panel-1"></div>
@@ -153,13 +174,37 @@ body.edit-mode .tbl .del-cell{display:table-cell}
   <div class="panel" id="panel-3"></div>
   <div class="panel" id="panel-4"></div>
 </div>
-
 <script>
-const STORAGE='lee_v2';
+const STORAGE='lee_v3';
 const statusCycle=['예정','진행중','완료'];
 const statusClass=['badge-plan','badge-prog','badge-done'];
 const catLabels={bill:'조례 제정',amend:'조례 개정',speech:'5분발언',query:'대집행부질의',audit:'행정사무감사',budget:'예산심의',etc:'기타'};
 let editMode=false;
+let pledgeView='field';
+
+/* ===== 선거 공약 데이터 (분야별) ===== */
+const ELECTION_FIELD=[
+  {cat:'교통',icon:'🚆',color:'#2E75B6',items:[
+    'GTX-A·B·C 지체없이 완공','GTX-D·E·F 국가계획 반영','지하철 다수 호선 연장 추진','경기북부 및 서울~연천·양주 고속(화)도로 조기 추진']},
+  {cat:'산업경제',icon:'🏭',color:'#D35400',items:[
+    '반도체 메가클러스터 조성','소재·부품·장비 및 AI산업 생태계 구축','산업단지 고도화 및 기업유치 확대','스타트업 및 혁신 클러스터 조성']},
+  {cat:'주거·도시',icon:'🏗️',color:'#8E44AD',items:[
+    '1기 신도시 재건축 추진','노후 계획도시 정비 확대','3기 신도시 보상 및 이주 대책','공공주택 확대 및 맞춤형 주거지원']},
+  {cat:'경기북부',icon:'🕊️',color:'#0F6E56',items:[
+    '평화경제특구 지정 및 규제 완화','미군반환공여지 개발 및 일자리 창출','DMZ 생태·평화 관광벨트 조성','경기북부 철도망(KTX, SRT, GTX 등) 추진']}
+];
+
+/* ===== 선거 공약 데이터 (대상별) ===== */
+const ELECTION_TARGET=[
+  {cat:'아동·청소년',icon:'👶',color:'#1B3A5C',items:[
+    '우리아이자립펀드 도입','13세까지 아동수당 지급','초등돌봄·방과후학교 확대']},
+  {cat:'청년·직장인',icon:'💼',color:'#2E75B6',items:[
+    '청년·신혼 주거복지 실현','중소벤처기업 성장 촉진','K패스 교통비 부담 완화']},
+  {cat:'중장년·여성',icon:'👩‍💼',color:'#D35400',items:[
+    '소상공인 안전망 구축','노동시간 단축 일·가정 양립','퇴직연금 확대 노후 보장']},
+  {cat:'어르신·장애인',icon:'🤝',color:'#8E44AD',items:[
+    '의료·돌봄·주거 통합지원','노인일자리·수당 증대','장애인활동지원·자립 강화']}
+];
 
 const DEFAULT={
 activities:[
@@ -181,11 +226,26 @@ activities:[
   {id:'a16',year:2,cat:'budget',title:'2028년도 예산심의',date:'2027.12월',status:0,body:'데이터 기반 문화정책 운영 예산|중장년 문화예술 2차년도 예산|경력단절여성 문화일자리|전국체전 후속 사업'},
 ],
 pledges:[
-  {id:'p1',title:'중장년 역량강화 모델 구축',status:0,link:'평생학습(55.8억), 문화일자리(23.3억), 아카데미 운영(5.5억)',body:'중장년 문화예술 활동 지원 조례 제정으로 법적 기반|경기도 평생교육진흥원 중장년 특화 프로그램 확대|문화일자리 사업 중장년 참여 비율 확대|세대 간 문화 교류 프로그램 개발'},
-  {id:'p2',title:'AI 시대 직업전환 교육 체계',status:0,link:'평생교육진흥 조례 개정, 콘텐츠 인력양성, 디지털 교육',body:'평생교육진흥 조례 개정으로 AI 교육 지원 근거|콘텐츠진흥원 인력양성 프로그램 중장년 확대|온라인·혼합형 학습 인프라 활용 직업 역량 교육'},
-  {id:'p3',title:'경력단절여성 문화일자리 지원',status:0,link:'문화일자리(23.3억), 문화예술진흥 조례 개정',body:'문화예술진흥 조례에 경력단절여성 우선 참여 근거|문화예술·콘텐츠 분야 재취업 지원 프로그램|경력단절여성 지원 관련 조례 2차년도 개정'},
-  {id:'p4',title:'데이터 기반 문화정책 수립',status:0,link:'도민 문화향유 실태조사, 문화지표, 문화영향평가',body:'데이터 기반 문화정책 수립 지원 조례 제정 (2차년도)|문화향유 실태조사 정례화 및 정책 환류 체계|문체국 사업 성과측정 데이터 체계 구축'},
+  {id:'p1',title:'중장년 역량강화 모델 구축',status:0,link:'평생학습(55.8억), 문화일자리(23.3억), 아카데미 운영(5.5억)',tasks:[
+    {text:'중장년 문화예술 활동 지원 조례 제정으로 법적 기반',status:0},
+    {text:'경기도 평생교육진흥원 중장년 특화 프로그램 확대',status:0},
+    {text:'문화일자리 사업 중장년 참여 비율 확대',status:0},
+    {text:'세대 간 문화 교류 프로그램 개발',status:0}]},
+  {id:'p2',title:'AI 시대 직업전환 교육 체계',status:0,link:'평생교육진흥 조례 개정, 콘텐츠 인력양성, 디지털 교육',tasks:[
+    {text:'평생교육진흥 조례 개정으로 AI 교육 지원 근거',status:0},
+    {text:'콘텐츠진흥원 인력양성 프로그램 중장년 확대',status:0},
+    {text:'온라인·혼합형 학습 인프라 활용 직업 역량 교육',status:0}]},
+  {id:'p3',title:'경력단절여성 문화일자리 지원',status:0,link:'문화일자리(23.3억), 문화예술진흥 조례 개정',tasks:[
+    {text:'문화예술진흥 조례에 경력단절여성 우선 참여 근거',status:0},
+    {text:'문화예술·콘텐츠 분야 재취업 지원 프로그램',status:0},
+    {text:'경력단절여성 지원 관련 조례 2차년도 개정',status:0}]},
+  {id:'p4',title:'데이터 기반 문화정책 수립',status:0,link:'도민 문화향유 실태조사, 문화지표, 문화영향평가',tasks:[
+    {text:'데이터 기반 문화정책 수립 지원 조례 제정 (2차년도)',status:0},
+    {text:'문화향유 실태조사 정례화 및 정책 환류 체계',status:0},
+    {text:'문체국 사업 성과측정 데이터 체계 구축',status:0}]},
 ],
+elecField:Array(16).fill(0),
+elecTarget:Array(12).fill(0),
 schedule:[
   {id:'s1',date:'2026.7',session:'제392회',cat:'임시회',text:'개원·상임위 구성, 업무보고, 문체국 현황 파악',status:0},
   {id:'s2',date:'2026.8',session:'비회기',cat:'조례 준비',text:'중장년 문화예술 조례 비교법제, 실태조사',status:0},
@@ -216,13 +276,30 @@ schedule:[
 };
 
 let data;
-function loadData(){try{const s=localStorage.getItem(STORAGE);data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT))}catch(e){data=JSON.parse(JSON.stringify(DEFAULT))}}
+function loadData(){
+  try{const s=localStorage.getItem(STORAGE);data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT))}
+  catch(e){data=JSON.parse(JSON.stringify(DEFAULT))}
+  if(!data.elecField) data.elecField=Array(16).fill(0);
+  if(!data.elecTarget) data.elecTarget=Array(12).fill(0);
+  data.pledges.forEach(pl=>{
+    if(typeof pl.body==='string'){pl.tasks=pl.body.split('|').filter(Boolean).map(t=>({text:t,status:0}));delete pl.body}
+    if(!pl.tasks) pl.tasks=[];
+  });
+}
 function saveData(){localStorage.setItem(STORAGE,JSON.stringify(data))}
 function resetAll(){if(confirm('모든 편집 내용을 초기 상태로 되돌리시겠습니까?')){localStorage.removeItem(STORAGE);loadData();renderAll()}}
 let nextId=1000;function genId(){return 'n'+(nextId++)}
 function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n))}
 function toggleEditMode(){editMode=document.getElementById('editToggle').checked;document.body.classList.toggle('edit-mode',editMode);renderAll()}
 function cycleStatus(arr,idx){arr[idx].status=(arr[idx].status+1)%3;saveData();renderAll()}
+function cycleElec(type,idx){
+  if(type==='field'){data.elecField[idx]=(data.elecField[idx]+1)%3}
+  else{data.elecTarget[idx]=(data.elecTarget[idx]+1)%3}
+  saveData();renderAll();
+}
+function cyclePledgeTask(pi,ti){data.pledges[pi].tasks[ti].status=(data.pledges[pi].tasks[ti].status+1)%3;saveData();renderAll()}
+function addPledgeTask(pi){data.pledges[pi].tasks.push({text:'새 할일',status:0});saveData();renderPledges()}
+function deletePledgeTask(pi,ti){if(confirm('이 할일을 삭제하시겠습니까?')){data.pledges[pi].tasks.splice(ti,1);saveData();renderPledges()}}
 let dragSrc=null,dragArr=null;
 function dragStart(e,arr,idx){dragSrc=idx;dragArr=arr;e.target.closest('.card').classList.add('dragging')}
 function dragEnd(e){document.querySelectorAll('.card').forEach(c=>c.classList.remove('dragging','drag-over'))}
@@ -236,19 +313,28 @@ function rowDragOver(e){e.preventDefault()}
 function rowDrop(e,idx){e.preventDefault();if(dragRowSrc===null||dragRowSrc===idx)return;const item=data.schedule.splice(dragRowSrc,1)[0];data.schedule.splice(idx,0,item);dragRowSrc=null;saveData();renderAll()}
 function deleteItem(arr,idx){if(confirm('이 항목을 삭제하시겠습니까?')){arr.splice(idx,1);saveData();renderAll()}}
 function addActivity(year){data.activities.push({id:genId(),year,cat:'etc',title:'새 항목',date:'시기 입력',status:0,body:'내용 입력'});saveData();renderAll();showTab(1)}
-function addPledge(){data.pledges.push({id:genId(),title:'새 공약',status:0,link:'연계 사업 입력',body:'세부 내용 입력'});saveData();renderAll();showTab(2)}
+function addPledge(){data.pledges.push({id:genId(),title:'새 공약',status:0,link:'연계 사업 입력',tasks:[{text:'할 일 입력',status:0}]});saveData();renderAll();showTab(2)}
 function addSchedule(){data.schedule.push({id:genId(),date:'시기',session:'회기',cat:'구분',text:'내용 입력',status:0});saveData();renderAll();showTab(3)}
 function bulletHTML(text){if(!text)return '';const items=text.split('|').filter(Boolean);return '<ul class="bl">'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>'}
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function elecStats(){
+  let fd=0,ft=0; data.elecField.forEach(s=>{ft++;if(s===2)fd++});
+  let ad=0,at=0; data.elecTarget.forEach(s=>{at++;if(s===2)ad++});
+  return {fd,ft,ad,at,td:fd+ad,tt:ft+at};
+}
 
 function renderDashboard(){
   const p=document.getElementById('panel-0');
   const count=(arr,fn)=>{let d=0,t=0;arr.forEach(i=>{if(fn(i)){t++;if(i.status===2)d++}});return{d,t}};
   const bills=count(data.activities,i=>i.cat==='bill'),amends=count(data.activities,i=>i.cat==='amend');
   const speeches=count(data.activities,i=>i.cat==='speech'),queries=count(data.activities,i=>i.cat==='query');
-  const pledges=count(data.pledges,()=>true);
+  const keyPledges=(()=>{let d=0,t=0;data.pledges.forEach(p=>(p.tasks||[]).forEach(tk=>{t++;if(tk.status===2)d++}));return{d,t}})();
   const totalD=bills.d+amends.d+speeches.d+queries.d,totalT=bills.t+amends.t+speeches.t+queries.t;
-  const pct=totalT?Math.round(totalD/totalT*100):0,ppct=pledges.t?Math.round(pledges.d/pledges.t*100):0;
+  const pct=totalT?Math.round(totalD/totalT*100):0;
+  const kpct=keyPledges.t?Math.round(keyPledges.d/keyPledges.t*100):0;
+  const es=elecStats();
+  const epct=es.tt?Math.round(es.td/es.tt*100):0;
   const upcoming=data.activities.filter(a=>a.status<2).slice(0,1);
   const nextText=upcoming.length?'<strong>'+escHtml(upcoming[0].date)+'</strong> — '+escHtml(upcoming[0].title):'모든 활동 완료!';
   p.innerHTML=`
@@ -260,7 +346,10 @@ function renderDashboard(){
       <div class="metric"><div class="metric-label">대집행부질의</div><div class="metric-val">${queries.d} <span>/ ${queries.t}</span></div></div>
     </div>
     <div class="card"><div class="card-title">📈 전체 의정활동 진행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-text">전체 ${totalT}개 항목 중 ${totalD}개 완료 (${pct}%)</div></div></div>
-    <div class="card"><div class="card-title">📋 공약이행 현황</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${ppct}%"></div></div><div class="prog-text">${pledges.t}개 핵심공약 중 ${pledges.d}개 완료 (${ppct}%)</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="card"><div class="card-title">📋 일반공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${epct}%;background:var(--acc)"></div></div><div class="prog-text">${es.tt}개 선거공약 중 ${es.td}개 완료 (${epct}%)</div></div></div>
+      <div class="card"><div class="card-title">⭐ 핵심공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${kpct}%;background:var(--green)"></div></div><div class="prog-text">${keyPledges.t}개 핵심공약 할일 중 ${keyPledges.d}개 완료 (${kpct}%)</div></div></div>
+    </div>
     <div class="section-title">📌 주요 예정 활동</div>
     ${data.activities.filter(a=>a.status<2).slice(0,8).map(a=>`<div class="card" style="padding:12px 20px"><div style="display:flex;align-items:center;justify-content:space-between"><div><span style="font-size:12px;color:var(--sec);font-weight:600">${escHtml(a.date)}</span> <span style="font-size:13px;color:#444;margin-left:8px">${escHtml(a.title)}</span></div><span class="badge ${statusClass[a.status]}" style="cursor:default;font-size:10px">${statusCycle[a.status]}</span></div></div>`).join('')}`;
 }
@@ -288,133 +377,88 @@ function renderActivities(){
   p.innerHTML=html;
 }
 
+let openAccIdx={};
+function toggleAcc(key){openAccIdx[key]=!openAccIdx[key];renderPledges()}
+
+function renderElecAccordion(groups,stateArr,type){
+  let html='',gi=0;
+  groups.forEach(g=>{
+    const startIdx=gi;
+    const done=g.items.reduce((s,_,i)=>s+(stateArr[startIdx+i]===2?1:0),0);
+    const prog=g.items.reduce((s,_,i)=>s+(stateArr[startIdx+i]===1?1:0),0);
+    const total=g.items.length;const key=type+'_'+g.cat;const isOpen=openAccIdx[key];
+    const ratioStyle=done===total?'background:var(--green-bg);color:var(--green)':prog>0?'background:var(--amber-bg);color:var(--amber)':'background:var(--lbg);color:var(--acc)';
+    html+=`<div class="acc-group ${isOpen?'open':''}"><div class="acc-header" onclick="toggleAcc('${key}')"><div class="acc-left"><span class="acc-icon">${g.icon}</span><span class="acc-name">${escHtml(g.cat)}</span><span class="acc-cnt">${total}개</span></div><div class="acc-right"><span class="acc-ratio" style="${ratioStyle}">${done}/${total}</span><span class="acc-arrow">▼</span></div></div><div class="acc-body">`;
+    g.items.forEach((item,i)=>{
+      const idx=startIdx+i;const st=stateArr[idx];const stIcon=st===2?'✓':st===1?'●':'';
+      html+=`<div class="acc-item"><div class="acc-st s${st}" onclick="cycleElec('${type}',${idx})" title="클릭하여 상태 변경">${stIcon}</div><span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}">${escHtml(item)}</span></div>`;
+    });
+    html+=`</div></div>`;gi+=g.items.length;
+  });
+  return html;
+}
+
 function renderPledges(){
-  const p=document.getElementById('panel-2');let html='<div class="section-title">🎯 핵심 공약 이행 현황</div>';
+  const p=document.getElementById('panel-2');let html='<div class="pledge-layout"><div>';
+  html+='<div class="section-title" style="margin-top:0">📋 선거 공약 이행현황</div>';
+  html+=`<div class="pledge-view-toggle"><div class="pledge-view-btn ${pledgeView==='field'?'active':''}" onclick="pledgeView='field';renderPledges()">분야별 보기</div><div class="pledge-view-btn ${pledgeView==='target'?'active':''}" onclick="pledgeView='target';renderPledges()">대상별 보기</div></div>`;
+  if(pledgeView==='field') html+=renderElecAccordion(ELECTION_FIELD,data.elecField,'field');
+  else html+=renderElecAccordion(ELECTION_TARGET,data.elecTarget,'target');
+  html+='</div><div>';
+  html+='<div class="section-title" style="margin-top:0">⭐ 핵심공약 이행현황</div>';
   data.pledges.forEach((pl,i)=>{
     html+=`<div class="card" draggable="${editMode}" ondragstart="dragStart(event,data.pledges,${i})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,data.pledges,${i})">
       <span class="grip" draggable="false">⠿</span><button class="del-btn" onclick="deleteItem(data.pledges,${i})">✕</button>
       <div class="card-title"><span class="badge ${statusClass[pl.status]}" onclick="cycleStatus(data.pledges,${i})">${statusCycle[pl.status]}</span> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].title=this.textContent.trim();saveData()"':''}>${escHtml(pl.title)}</span></div>
-      <div class="card-body"><strong>▶ 문체위 연계:</strong> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].link=this.textContent.trim();saveData()"':''}>${escHtml(pl.link)}</span>${bulletHTML(pl.body)}</div></div>`;
+      <div class="card-body"><strong>▶ 문체위 연계:</strong> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].link=this.textContent.trim();saveData()"':''}>${escHtml(pl.link)}</span>
+        <div style="margin-top:8px">
+        ${(pl.tasks||[]).map((t,ti)=>{
+          const st=t.status;const stIcon=st===2?'✓':st===1?'●':'';
+          return `<div class="acc-item"><div class="acc-st s${st}" onclick="cyclePledgeTask(${i},${ti})" title="클릭하여 상태 변경">${stIcon}</div><span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}" ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].tasks['+ti+'].text=this.textContent.trim();saveData()"':''}>${escHtml(t.text)}</span>${editMode?'<span style="margin-left:auto;color:var(--red);cursor:pointer;font-size:12px;flex-shrink:0" onclick="deletePledgeTask('+i+','+ti+')">✕</span>':''}</div>`}).join('')}
+        ${editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addPledgeTask('+i+')">＋ 할일 추가</button></div>':''}
+        </div></div></div>`;
   });
-  html+='<button class="add-btn" onclick="addPledge()">＋ 공약 추가</button>';p.innerHTML=html;
+  html+='<button class="add-btn" onclick="addPledge()">＋ 핵심공약 추가</button></div></div>';
+  p.innerHTML=html;
 }
 
-/* ===== CALENDAR ===== */
 let calYear=2026,calMonth=7;
-function parseSchedDate(d){if(!d)return null;const p=d.replace(/[년월일]/g,'.').replace(/\s/g,'').split('.').filter(Boolean).map(Number);if(p.length>=2&&p[0]>2000)return{y:p[0],m:p[1],d:p[2]||null};return null}
+function parseSchedDate(d){if(!d)return null;const pp=d.replace(/[년월일]/g,'.').replace(/\s/g,'').split('.').filter(Boolean).map(Number);if(pp.length>=2&&pp[0]>2000)return{y:pp[0],m:pp[1],d:pp[2]||null};return null}
 function calPrev(){calMonth--;if(calMonth<1){calMonth=12;calYear--}renderSchedule()}
 function calNext(){calMonth++;if(calMonth>12){calMonth=1;calYear++}renderSchedule()}
 function ymd(y,m,d){return y*10000+m*100+d}
-
-/* 의회 회기 (배경색용) */
 const SESS=[[20260707,20260723],[20260901,20260918],[20261103,20261217]];
-
-/* 의회일정 + 준비기간 오버레이 [startYMD, endYMD, label, cssClass, priority] */
 const OVERLAY=[
-  /* ── 제392회 임시회 (7.7~7.23) ── */
-  [20260707,20260707,'본회의(개원·의장선거)','ple',1],
-  [20260714,20260714,'본회의(업무보고)','ple',1],
-  [20260716,20260716,'본회의(상임위선임)','ple',1],
-  [20260720,20260722,'상임위 활동','com',1],
-  [20260723,20260723,'본회의(안건심의)','ple',1],
-  /* ── 제393회 임시회 (9.1~9.18) ── */
-  [20260901,20260901,'본회의(개회)','ple',1],
-  [20260902,20260903,'대집행부질문','ple',1],
-  [20260904,20260910,'상임위 활동','com',1],
-  [20260911,20260917,'예결위 활동','bud',1],
-  [20260918,20260918,'본회의(안건심의)','ple',1],
-  /* ── 제394회 정례회 (11.3~12.17) ── */
-  [20261103,20261103,'본회의(개회)','ple',1],
-  [20261104,20261105,'대집행부질문','ple',1],
-  [20261106,20261119,'행정사무감사','aud',1],
-  [20261120,20261125,'상임위(예산·조례)','com',1],
-  [20261126,20261126,'본회의(조례심의)','ple',1],
-  [20261127,20261210,'예결위(예산심사)','bud',1],
-  [20261211,20261211,'본회의(예산심의)','ple',1],
-  [20261214,20261216,'상임위(조례)','com',1],
-  [20261217,20261217,'본회의(감사보고)','ple',1],
-  /* ── 공휴일·기념일 ── */
-  [20260717,20260717,'제헌절','hol',0],
-  [20260924,20260926,'추석 연휴','hol',0],
-  [20261119,20261119,'대학수능','hol',0],
-  /* ── 준비기간 (본회의 기준) ── */
-  [20260812,20260831,'5분발언 준비(20일)','prS',2],
-  [20261009,20261102,'조례 준비(25일)','prB',2],
-  [20261014,20261102,'질의 준비(20일)','prQ',2],
-  /* ── 준비기간 (상임위 기준) ── */
-  [20261017,20261105,'감사 준비(20일)','prA',2],
-  [20261113,20261119,'예산 준비(7일)','prU',2],
+  [20260707,20260707,'본회의(개원·의장선거)','ple',1],[20260714,20260714,'본회의(업무보고)','ple',1],[20260716,20260716,'본회의(상임위선임)','ple',1],[20260720,20260722,'상임위 활동','com',1],[20260723,20260723,'본회의(안건심의)','ple',1],
+  [20260901,20260901,'본회의(개회)','ple',1],[20260902,20260903,'대집행부질문','ple',1],[20260904,20260910,'상임위 활동','com',1],[20260911,20260917,'예결위 활동','bud',1],[20260918,20260918,'본회의(안건심의)','ple',1],
+  [20261103,20261103,'본회의(개회)','ple',1],[20261104,20261105,'대집행부질문','ple',1],[20261106,20261119,'행정사무감사','aud',1],[20261120,20261125,'상임위(예산·조례)','com',1],[20261126,20261126,'본회의(조례심의)','ple',1],[20261127,20261210,'예결위(예산심사)','bud',1],[20261211,20261211,'본회의(예산심의)','ple',1],[20261214,20261216,'상임위(조례)','com',1],[20261217,20261217,'본회의(감사보고)','ple',1],
+  [20260717,20260717,'제헌절','hol',0],[20260924,20260926,'추석 연휴','hol',0],[20261119,20261119,'대학수능','hol',0],
+  [20260812,20260831,'5분발언 준비(20일)','prS',2],[20261009,20261102,'조례 준비(25일)','prB',2],[20261014,20261102,'질의 준비(20일)','prQ',2],
+  [20261017,20261105,'감사 준비(20일)','prA',2],[20261113,20261119,'예산 준비(7일)','prU',2],
 ];
 
 function renderCalendar(){
-  const first=new Date(calYear,calMonth-1,1);
-  const startDow=first.getDay();
-  const dim=new Date(calYear,calMonth,0).getDate();
-  const prevDays=new Date(calYear,calMonth-1,0).getDate();
+  const first=new Date(calYear,calMonth-1,1);const startDow=first.getDay();const dim=new Date(calYear,calMonth,0).getDate();const prevDays=new Date(calYear,calMonth-1,0).getDate();
   const today=new Date();const tY=today.getFullYear(),tM=today.getMonth()+1,tD=today.getDate();
   const mStart=ymd(calYear,calMonth,1),mEnd=ymd(calYear,calMonth,dim);
-
-  const evts={};
-  const add=(d,text,cls,pri)=>{if(!evts[d])evts[d]=[];evts[d].push({text,cls,pri:pri||5})};
-
-  OVERLAY.forEach(([s,e,label,cls,pri])=>{
-    if(e<mStart||s>mEnd)return;
-    const ds=s<mStart?1:(s%100),de=e>mEnd?dim:((Math.floor(e/100)%100===calMonth)?e%100:dim);
-    for(let d=ds;d<=de;d++) add(d, d===ds?label:'', cls, pri);
-  });
-
-  data.schedule.forEach((s,i)=>{
-    if(s.cat==='__divider__')return;
-    const pd=parseSchedDate(s.date);
-    if(!pd||pd.y!==calYear||pd.m!==calMonth)return;
-    add(pd.d||1, s.cat+': '+s.text, 'st'+s.status, 5);
-  });
-
+  const evts={};const add=(d,text,cls,pri)=>{if(!evts[d])evts[d]=[];evts[d].push({text,cls,pri:pri||5})};
+  OVERLAY.forEach(([s,e,label,cls,pri])=>{if(e<mStart||s>mEnd)return;const ds=s<mStart?1:(s%100),de=e>mEnd?dim:((Math.floor(e/100)%100===calMonth)?e%100:dim);for(let d=ds;d<=de;d++) add(d,d===ds?label:'',cls,pri)});
+  data.schedule.forEach((s,i)=>{if(s.cat==='__divider__')return;const pd=parseSchedDate(s.date);if(!pd||pd.y!==calYear||pd.m!==calMonth)return;add(pd.d||1,s.cat+': '+s.text,'st'+s.status,5)});
   function inSess(d){const dn=ymd(calYear,calMonth,d);return SESS.some(([s,e])=>dn>=s&&dn<=e)}
-
-  let html='<div class="cal-wrap"><div class="cal-nav">';
-  html+='<button onclick="calPrev()">◀</button>';
-  html+=`<span class="cal-month">${calYear}년 ${calMonth}월</span>`;
-  html+='<button onclick="calNext()">▶</button></div>';
-  html+='<div class="cal-grid">';
+  let html='<div class="cal-wrap"><div class="cal-nav"><button onclick="calPrev()">◀</button><span class="cal-month">'+calYear+'년 '+calMonth+'월</span><button onclick="calNext()">▶</button></div><div class="cal-grid">';
   ['일','월','화','수','목','금','토'].forEach((dn,di)=>html+=`<div class="cal-hdr${di===0?' sun':''}${di===6?' sat':''}">${dn}</div>`);
-
   for(let i=startDow-1;i>=0;i--) html+=`<div class="cal-cell other"><div class="cal-day">${prevDays-i}</div></div>`;
-
-  for(let d=1;d<=dim;d++){
-    const dow=(startDow+d-1)%7;
-    let cls='cal-cell';
-    if(calYear===tY&&calMonth===tM&&d===tD) cls+=' today';
-    if(dow===0) cls+=' sun';
-    if(dow===6) cls+=' sat';
-    if(inSess(d)) cls+=' in-session';
-    html+=`<div class="${cls}"><div class="cal-day">${d}</div>`;
-    if(evts[d]){
-      const sorted=evts[d].sort((a,b)=>a.pri-b.pri);
-      const show=sorted.slice(0,4);
-      show.forEach(ev=>{
-        if(ev.text) html+=`<div class="cal-evt ${ev.cls}" title="${escHtml(ev.text)}">${escHtml(ev.text)}</div>`;
-        else html+=`<div class="cal-evt ${ev.cls} cal-bar"></div>`;
-      });
-      if(sorted.length>4) html+=`<div class="cal-more">+${sorted.length-4}</div>`;
-    }
-    html+='</div>';
-  }
-
-  const total=startDow+dim,remain=total%7===0?0:7-total%7;
-  for(let i=1;i<=remain;i++) html+=`<div class="cal-cell other"><div class="cal-day">${i}</div></div>`;
+  for(let d=1;d<=dim;d++){const dow=(startDow+d-1)%7;let cls='cal-cell';if(calYear===tY&&calMonth===tM&&d===tD)cls+=' today';if(dow===0)cls+=' sun';if(dow===6)cls+=' sat';if(inSess(d))cls+=' in-session';html+=`<div class="${cls}"><div class="cal-day">${d}</div>`;if(evts[d]){const sorted=evts[d].sort((a,b)=>a.pri-b.pri);sorted.slice(0,4).forEach(ev=>{if(ev.text)html+=`<div class="cal-evt ${ev.cls}" title="${escHtml(ev.text)}">${escHtml(ev.text)}</div>`;else html+=`<div class="cal-evt ${ev.cls} cal-bar"></div>`});if(sorted.length>4)html+=`<div class="cal-more">+${sorted.length-4}</div>`}html+='</div>'}
+  const total=startDow+dim,remain=total%7===0?0:7-total%7;for(let i=1;i<=remain;i++)html+=`<div class="cal-cell other"><div class="cal-day">${i}</div></div>`;
   html+='</div>';
-
   html+=`<div class="cal-legend"><span><i style="background:#1B3A5C"></i>본회의</span><span><i style="background:#2E75B6"></i>상임위</span><span><i style="background:#D35400"></i>감사</span><span><i style="background:#8E44AD"></i>예결위</span><span><i style="background:#E53935"></i>공휴일</span></div>`;
   html+=`<div class="cal-legend2"><span><i style="background:#009688"></i>발언준비</span><span><i style="background:#E67E22"></i>조례준비</span><span><i style="background:#3F51B5"></i>질의준비</span><span><i style="background:#C0392B"></i>감사준비</span><span><i style="background:#9B59B6"></i>예산준비</span></div>`;
-  html+='</div>';
-  return html;
+  html+='</div>';return html;
 }
 
 function renderSchedule(){
   const p=document.getElementById('panel-3');let rows='';
-  data.schedule.forEach((s,i)=>{
-    if(s.cat==='__divider__'){rows+=`<tr class="divider-row"><td colspan="${editMode?'7':'5'}">${escHtml(s.text)}</td></tr>`;return;}
+  data.schedule.forEach((s,i)=>{if(s.cat==='__divider__'){rows+=`<tr class="divider-row"><td colspan="${editMode?'7':'5'}">${escHtml(s.text)}</td></tr>`;return;}
     rows+=`<tr draggable="${editMode}" ondragstart="rowDragStart(event,${i})" ondragend="rowDragEnd(event)" ondragover="rowDragOver(event)" ondrop="rowDrop(event,${i})">
       ${editMode?'<td class="grip-cell" style="display:table-cell">⠿</td>':''}
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+i+'].date=this.textContent.trim();saveData();renderSchedule()"':''}>${escHtml(s.date)}</td>
@@ -422,14 +466,10 @@ function renderSchedule(){
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+i+'].cat=this.textContent.trim();saveData()"':''}>${escHtml(s.cat)}</td>
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+i+'].text=this.textContent.trim();saveData()"':''}>${escHtml(s.text)}</td>
       <td><span class="badge ${statusClass[s.status]}" onclick="cycleStatus(data.schedule,${i})">${statusCycle[s.status]}</span></td>
-      ${editMode?'<td class="del-cell" style="display:table-cell" onclick="deleteItem(data.schedule,'+i+')">🗑</td>':''}</tr>`;
-  });
-  p.innerHTML=`<div class="section-title">📅 전반기 의정활동 일정표</div>
-    ${renderCalendar()}
-    <div class="section-title" style="margin-top:32px">📋 일정 상세 목록</div>
-    <table class="tbl"><thead><tr>${editMode?'<th style="width:40px"></th>':''}
-    <th style="width:80px">시기</th><th style="width:80px">회기</th><th style="width:110px">구분</th><th>주요 내용</th><th style="width:60px">상태</th>${editMode?'<th style="width:40px"></th>':''}</tr></thead>
-    <tbody>${rows}</tbody></table><button class="add-btn" onclick="addSchedule()">＋ 일정 추가</button>`;
+      ${editMode?'<td class="del-cell" style="display:table-cell" onclick="deleteItem(data.schedule,'+i+')">🗑</td>':''}</tr>`});
+  p.innerHTML=`<div class="section-title">📅 전반기 의정활동 일정표</div>${renderCalendar()}<div class="section-title" style="margin-top:32px">📋 일정 상세 목록</div>
+    <table class="tbl"><thead><tr>${editMode?'<th style="width:40px"></th>':''}<th style="width:80px">시기</th><th style="width:80px">회기</th><th style="width:110px">구분</th><th>주요 내용</th><th style="width:60px">상태</th>${editMode?'<th style="width:40px"></th>':''}</tr></thead><tbody>${rows}</tbody></table>
+    <button class="add-btn" onclick="addSchedule()">＋ 일정 추가</button>`;
 }
 
 function renderProfile(){
@@ -437,13 +477,17 @@ function renderProfile(){
     <div class="section-title">👤 의원 프로필</div>
     <table class="prof-tbl">
       <tr><th>성명</th><td>이미정</td></tr>
-      <tr><th>생년월일</th><td>1981.7.26. (45세)</td></tr>
+      <tr><th>생년월일</th><td>1981. 7. 26. (45세)</td></tr>
       <tr><th>소속정당</th><td>더불어민주당</td></tr>
       <tr><th>선거구</th><td>비례대표</td></tr>
       <tr><th>당선횟수</th><td>초선 (경기도의회)</td></tr>
       <tr><th>상임위원회</th><td>문화체육관광위원회</td></tr>
       <tr><th>핵심 전문성</th><td>중장년 일자리·평생교육, AI 디지털 전환, 경력단절여성 지원, 데이터 기반 정책</td></tr>
     </table>
+    <div class="sub-title">학력</div>
+    <ul class="bl"><li>경기대학교 대학원 e-비즈니스학 전공 졸업 (경영학 박사)</li></ul>
+    <div class="sub-title">주요 경력</div>
+    <ul class="bl"><li>(현) 수원대학교 고용서비스대학원 주임교수</li><li>(현) 더불어민주당 정책위원회 부의장</li><li>(현) 한양대학교 광고홍보학과 겸임교수</li><li>(현) 화성시인재육성재단 감사</li><li>(전) 한국직업능력연구원 위촉연구원</li></ul>
     <div class="sub-title">핵심 공약 방향</div>
     <ul class="bl"><li>중장년 역량강화 모델 구축 — 50+ 세대 문화예술 참여·일자리 확대</li><li>AI 시대 직업전환 교육 — 평생학습 인프라 활용 디지털 역량교육</li><li>경력단절여성 지원 — 문화·콘텐츠 분야 재취업 프로그램</li><li>데이터 기반 문화정책 — 문화지표 조사 정례화, 성과 환류 체계</li></ul>
     <div class="section-title">🔗 문체국 주요사업 연계 분석</div>
