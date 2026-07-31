@@ -57,14 +57,14 @@ body.edit-mode .reset-btn{display:inline-block}
 .tbl .divider-row td{background:var(--lbg);text-align:center;font-weight:600;color:var(--sec);padding:8px}
 ul.bl{list-style:none;padding-left:0;margin:4px 0}
 ul.bl li{padding:3px 0 3px 18px;position:relative;font-size:13px;color:#444}
-ul.bl li::before{content:'●';position:absolute;left:0;color:var(--acc);font-size:8px;top:7px}
+ul.bl li::before{content:'';position:absolute;left:0;width:6px;height:6px;background:var(--acc);border-radius:50%;top:10px}
 .prof-tbl{width:100%;border-collapse:collapse;margin-top:8px}
 .prof-tbl th{background:var(--pri);color:var(--wh);padding:10px 14px;text-align:center;font-weight:500;width:140px;font-size:13px}
 .prof-tbl td{padding:10px 14px;border:1px solid var(--bd);font-size:13px}
 .prog-bar{height:14px;background:#E0E4E8;border-radius:7px;overflow:hidden;margin:8px 0 4px}
 .prog-fill{height:100%;background:var(--sec);border-radius:7px;transition:width .5s}
 .prog-text{font-size:12px;color:var(--gr)}
-.next-alert{background:linear-gradient(135deg,var(--lbg),var(--lbg2));border:1px solid var(--acc);border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.next-alert{background:linear-gradient(135deg,var(--lbg),var(--lbg2));border:1px solid var(--acc);border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;border-left:4px solid var(--sec)}
 .next-alert .text{font-size:13px;color:var(--pri)}
 .next-alert .text strong{color:var(--sec)}
 
@@ -166,10 +166,10 @@ body.edit-mode .small-del{display:inline-block}
 <body>
 
 <div class="top-bar">
-  <h1>📋 제12대 경기도의회 전반기 의정지원 계획 <span class="period">2026.7 ~ 2028.6</span></h1>
+  <h1>제12대 경기도의회 전반기 의정지원 계획 <span class="period">2026.7 ~ 2028.6</span></h1>
   <div class="top-right">
     <div class="sync-ind" id="syncInd" onclick="setupToken()" title="클릭하여 토큰 설정"><span class="sync-dot offline" id="syncDot"></span><span id="syncTxt">오프라인</span></div>
-    <button class="reset-btn" onclick="resetAll()">↩ 초기화</button>
+    <button class="reset-btn" onclick="resetAll()">초기화</button>
     <label class="edit-toggle"><input type="checkbox" id="editToggle" onchange="toggleEditMode()"><span class="toggle-track"></span>편집 모드</label>
   </div>
 </div>
@@ -183,11 +183,12 @@ body.edit-mode .small-del{display:inline-block}
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab(0)">📊 대시보드</div>
-  <div class="tab" onclick="showTab(1)">🏛️ 문체위 활동</div>
-  <div class="tab" onclick="showTab(2)">✅ 공약이행</div>
-  <div class="tab" onclick="showTab(3)">📅 일정표</div>
-  <div class="tab" onclick="showTab(4)">👤 프로필</div>
+  <div class="tab active" onclick="showTab(0)">대시보드</div>
+  <div class="tab" onclick="showTab(1)">의정활동</div>
+  <div class="tab" onclick="showTab(2)">조사·분석</div>
+  <div class="tab" onclick="showTab(3)">공약이행</div>
+  <div class="tab" onclick="showTab(4)">일정표</div>
+  <div class="tab" onclick="showTab(5)">프로필</div>
 </div>
 
 <div class="content">
@@ -196,10 +197,11 @@ body.edit-mode .small-del{display:inline-block}
   <div class="panel" id="panel-2"></div>
   <div class="panel" id="panel-3"></div>
   <div class="panel" id="panel-4"></div>
+  <div class="panel" id="panel-5"></div>
 </div>
 
 <script>
-const STORAGE='lee_v3';
+const STORAGE='lee_v4';
 const GIST_ID='e6235fb6dc87970ea962a36aae81e768';
 const GIST_FILE='lee_data.json';
 const TOKEN_KEY='gist_token';
@@ -226,56 +228,127 @@ async function pullFromGist(){const token=getToken();if(!token){setSyncStatus('o
       if(!data.elecTarget) data.elecTarget=Array(12).fill(0);
       data.activities.forEach(a=>{if(typeof a.body==='string'){const sep=a.body.includes('|')?'|':'\n';a.tasks=a.body.split(sep).filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.body};if(!a.tasks)a.tasks=[];if(typeof a.details==='string'){a.preps=a.details.split('|').filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.details};if(!a.preps)a.preps=[]});
       data.pledges.forEach(pl=>{if(typeof pl.body==='string'){pl.tasks=pl.body.split('|').filter(Boolean).map(t=>({text:t,status:0}));delete pl.body};if(!pl.tasks)pl.tasks=[]});
+      if(!data.research) data.research=[];
+      data.research.forEach(r=>{if(!r.tasks)r.tasks=[]});
       localStorage.setItem(STORAGE,JSON.stringify(data));renderAll();setSyncStatus('synced','클라우드에서 불러옴')}
     else{setSyncStatus('synced','동기화됨');if(localTs>0&&remoteTs<localTs)debouncedPush()}
   }catch(e){setSyncStatus('error','연결 오류')}}
 const statusCycle=['예정','진행중','완료'];
 const statusClass=['badge-plan','badge-prog','badge-done'];
-const catLabels={bill:'조례 제정',amend:'조례 개정',speech:'5분발언',query:'대집행부질의',audit:'행정사무감사',budget:'예산심의',etc:'기타'};
+const catLabels={bill:'조례',audit:'행정사무감사',speech:'발언·질의',budget:'예산·결산',research:'정보수집·제도개선'};
 let editMode=false;
 let pledgeView='field';
 
 /* ===== 선거 공약 데이터 (분야별) ===== */
 const ELECTION_FIELD=[
-  {cat:'교통',icon:'🚌',color:'#2E75B6',items:['GTX-A·B 수원·의정부 조기 완공 추진','신분당선 연장(호매실~봉담) 추진','수원 버스전용차로 확대 및 도시철도 연계','경기도 광역버스 노선 재편 및 증차']},
-  {cat:'산업경제',icon:'💰',color:'#D35400',items:['경기도 중장년 재취업 플랫폼 구축','AI·디지털 전환 직업훈련 확대','소상공인 디지털 경영 지원','청년 창업지원 펀드 확대']},
-  {cat:'주거·도시',icon:'🏘️',color:'#8E44AD',items:['신혼부부·청년 공공임대 확충','노후 아파트 리모델링 지원','도시재생 뉴딜사업 확대','주거취약계층 긴급주거 지원']},
-  {cat:'경기북부',icon:'🌿',color:'#0F6E56',items:['경기북부특별자치도 설치 지원','경기북부 문화·체육 인프라 확충','접경지역 평화경제 지원','경기북부 교통 SOC 확대']}
+  {cat:'교통',icon:'',color:'#2E75B6',items:['GTX-A·B 수원·의정부 조기 완공 추진','신분당선 연장(호매실~봉담) 추진','수원 버스전용차로 확대 및 도시철도 연계','경기도 광역버스 노선 재편 및 증차']},
+  {cat:'산업경제',icon:'',color:'#D35400',items:['경기도 중장년 재취업 플랫폼 구축','AI·디지털 전환 직업훈련 확대','소상공인 디지털 경영 지원','청년 창업지원 펀드 확대']},
+  {cat:'주거·도시',icon:'',color:'#8E44AD',items:['신혼부부·청년 공공임대 확충','노후 아파트 리모델링 지원','도시재생 뉴딜사업 확대','주거취약계층 긴급주거 지원']},
+  {cat:'경기북부',icon:'',color:'#0F6E56',items:['경기북부특별자치도 설치 지원','경기북부 문화·체육 인프라 확충','접경지역 평화경제 지원','경기북부 교통 SOC 확대']}
 ];
 
 /* ===== 선거 공약 데이터 (대상별) ===== */
 const ELECTION_TARGET=[
-  {cat:'아동·청소년',icon:'👶',color:'#1B3A5C',items:['아동·청소년 문화예술교육 확대','학교 밖 청소년 지원 강화','아동학대 예방 인프라 구축']},
-  {cat:'청년·직장인',icon:'💼',color:'#2E75B6',items:['청년 문화패스 확대','직장인 평생학습 지원','청년 정신건강 지원 강화']},
-  {cat:'중장년·여성',icon:'👩',color:'#D35400',items:['경력단절여성 재취업 지원','중장년 문화일자리 확대','여성 안심 생활환경 조성']},
-  {cat:'어르신·장애인',icon:'🤝',color:'#8E44AD',items:['어르신 디지털 교육 확대','장애인 문화향유 접근성 강화','노인 돌봄 서비스 확충']}
+  {cat:'아동·청소년',icon:'',color:'#1B3A5C',items:['아동·청소년 문화예술교육 확대','학교 밖 청소년 지원 강화','아동학대 예방 인프라 구축']},
+  {cat:'청년·직장인',icon:'',color:'#2E75B6',items:['청년 문화패스 확대','직장인 평생학습 지원','청년 정신건강 지원 강화']},
+  {cat:'중장년·여성',icon:'',color:'#D35400',items:['경력단절여성 재취업 지원','중장년 문화일자리 확대','여성 안심 생활환경 조성']},
+  {cat:'어르신·장애인',icon:'',color:'#8E44AD',items:['어르신 디지털 교육 확대','장애인 문화향유 접근성 강화','노인 돌봄 서비스 확충']}
 ];
 
 /* ===== DEFAULT DATA ===== */
 const DEFAULT={
 activities:[
-  {id:'a1',year:1,cat:'bill',title:'경기도 중장년 문화예술 활동 지원 조례',date:'2026.11월 제394회 정례회',status:0,body:'50+ 중장년 대상 문화예술 참여·창작·교육 지원 체계, 중장년 전용 문화 프로그램, 세대 간 문화 교류, 경기문화재단·시군 협력\n연계: 경기도민 평생학습(55.8억), 아카데미 운영(5.5억), 문화일자리(23.3억)',details:'중장년 문화예술 참여 현황 및 수요 조사|타 시도 중장년 문화 관련 조례 비교분석|중장년 문화단체·전문가 간담회 (10월)|경기문화재단·경기도 평생교육진흥원 협의 (10월)|입법조사처 조례안 검토 의뢰 (10월 중순)'},
-  {id:'a2',year:1,cat:'amend',title:'평생교육진흥 조례 일부개정',date:'2027.2월',status:0,body:'AI·디지털 전환 대응 직업 역량교육 프로그램 지원 근거|중장년 직업전환 교육 특화 과정 개설 지원|온라인·혼합형 평생학습 운영 방식 다양화'},
-  {id:'a3',year:1,cat:'amend',title:'문화예술진흥 조례 일부개정',date:'2027.4월',status:0,body:'문화일자리 사업에 중장년·경력단절여성 우선 참여 근거|문화예술 분야 사회적 경제 조직 지원 조항|예술인 복지·권익보호 관련 조항 강화'},
-  {id:'a4',year:1,cat:'speech',title:'「중장년 문화일자리, 경기도가 선도해야 합니다」',date:'2026.9월 제393회',status:0,body:'중장년층 문화예술 활동 현황 및 정책 사각지대|문화일자리 사업(23.3억) 중장년 참여 확대 필요성|중장년 문화예술 조례 추진 배경 소개'},
-  {id:'a5',year:1,cat:'speech',title:'「AI 시대, 경기도 평생학습이 달라져야 합니다」',date:'2027.2월',status:0,body:'AI·디지털 전환에 따른 직업 역량 교육 필요성|경기도 평생교육진흥원 온라인 학습 인프라 현황|경력단절여성 재취업과 문화산업 연계 방안'},
-  {id:'a6',year:1,cat:'query',title:'「경기도 문화일자리 사업의 중장년·취약계층 포용성 강화 방안」',date:'2026.11월 제394회',status:0,body:'문화일자리 23.3억 중 중장년 참여 비율 현황|경기문화재단 문화예술교육 프로그램 중장년 비중|AI·디지털 전환 대응 직업전환 교육 현황|통합문화이용권 778억 중장년 접근성 실태|평생교육진흥원 온라인 학습 인프라 고도화 계획'},
-  {id:'a7',year:1,cat:'audit',title:'문체위 소관 기관 감사',date:'2026.11.6.~11.19.',status:0,body:'경기문화재단: 중장년 문화프로그램 현황, 문화일자리 운영|경기도 평생교육진흥원: AI교육 프로그램, 중장년 학습 참여율|경기콘텐츠진흥원: 인력양성 프로그램 중장년 확대 현황|경기아트센터: 중장년 예술교육 프로그램 운영 현황|경기도체육회: 생활체육 중장년 참여 실태|한국도자재단: 경영 효율성 및 교육 프로그램'},
-  {id:'a8',year:1,cat:'budget',title:'2027년도 예산심의',date:'2026.12월 제394회',status:0,body:'중장년 문화예술 프로그램 신규 예산 확보|AI 직업전환 교육 예산 확대|문화일자리 중장년 참여 확대 예산|경력단절여성 문화분야 재취업 예산|평생교육 온라인 인프라 예산'},
-  {id:'a9',year:2,cat:'bill',title:'데이터 기반 문화정책 수립 지원 조례',date:'2027.11월 정례회',status:0,body:'도민 문화향유 실태조사 정례화, 문화지표 개발, 문화영향평가 체계, 데이터 기반 정책 환류\n연계: 문화향유 실태조사, 문화지표 운영, 문화영향평가'},
-  {id:'a10',year:2,cat:'amend',title:'경력단절여성 지원 관련 조례 일부개정',date:'2027.9월',status:0,body:'문화예술·콘텐츠 분야 경력단절여성 재취업 지원 특화 조항'},
-  {id:'a11',year:2,cat:'amend',title:'중장년 문화예술 조례 시행 보완 개정',date:'2028.2월',status:0,body:'1차년도 조례 시행 후 현장 의견 반영 보완'},
-  {id:'a12',year:2,cat:'speech',title:'「전국체전, 경기도민의 스포츠 문화를 바꿀 기회입니다」',date:'2027.9월',status:0,body:'전국체전 레거시, 생활체육 인프라 활용|중장년 체육 참여 확대'},
-  {id:'a13',year:2,cat:'speech',title:'「데이터로 보는 경기도 문화정책, 성과와 과제」',date:'2028.2월',status:0,body:'데이터 기반 조례 1년 성과|전반기 의정활동 총정리'},
-  {id:'a14',year:2,cat:'query',title:'「2027 전국체전 이후 경기도 체육·문화 인프라의 지속가능 활용 방안」',date:'2027.11월 정례회',status:0,body:'전국체전 경기장 74개소 사후 활용 계획|중장년 문화예술 조례 시행 성과|AI 직업전환 교육 프로그램 운영 현황|경력단절여성 문화일자리 참여 성과'},
-  {id:'a15',year:2,cat:'audit',title:'2027년 행정사무감사',date:'2027.11월',status:0,body:'전국체전 집행 감사|중장년 문화 조례 시행 성과|평생학습 AI 교육 실적|경력단절여성 지원'},
-  {id:'a16',year:2,cat:'budget',title:'2028년도 예산심의',date:'2027.12월',status:0,body:'데이터 기반 문화정책 운영 예산|중장년 문화예술 2차년도 예산|경력단절여성 문화일자리|전국체전 후속 사업'},
+  {id:'a1',year:1,cat:'bill',title:'시·도 미술관 후원회 설립 근거 마련 조례',date:'2026.11월 제394회 정례회',status:0,tasks:[
+    {text:'타 지자체 및 국립현대미술관 후원회 운영 조례 입법례 조사',status:0},
+    {text:'문화예술진흥법 등 상위법 저촉 여부 입법 검토',status:0},
+    {text:'도 문화체육관광국·도립미술관 실무진 간담회',status:0},
+    {text:'조례안 초안 작성 및 전문위원실 검토 요청',status:0}
+  ],preps:[
+    {text:'기부금품법 관련 법적 검토',status:0},
+    {text:'후원회 이사회 구성·기부금 활용 범위 조문 설계',status:0},
+    {text:'입법예고 및 상임위 안건 제출 준비',status:0}
+  ]},
+  {id:'a2',year:1,cat:'research',title:'장애인체육회 포상금 원천징수 과세 정상화',date:'2026.8~10월',status:0,tasks:[
+    {text:'소득세법 시행령 §87 필요경비 80% 적용 법리 검토',status:0},
+    {text:'국세청 서면질의 추진 촉구 (경기도장애인체육회)',status:0},
+    {text:'최근 2~3년간 과다 원천징수(22%) 선수별 피해 실태 파악',status:0},
+    {text:'(유권해석 불가 시) 세액보전수당 신설 / 예산증액안 마련',status:0}
+  ],preps:[
+    {text:'현행 22% 전액 과세 방식 vs 필요경비 80% 공제(4.4%) 비교분석',status:0},
+    {text:'도 체육과·장애인체육회 협의',status:0}
+  ]},
+  {id:'a3',year:1,cat:'speech',title:'5분발언 (주제 연동)',date:'2026.9월 제393회',status:0,tasks:[],preps:[]},
+  {id:'a4',year:1,cat:'speech',title:'대집행부질의',date:'2026.11월 제394회',status:0,tasks:[],preps:[]},
+  {id:'a5',year:1,cat:'audit',title:'문체위 소관 기관 행정사무감사',date:'2026.11.6.~11.19.',status:0,tasks:[
+    {text:'전국체전 사립대 시설 개보수 예산 검증',status:0},
+    {text:'의료웰니스관광 사업 실효성 검토',status:0},
+    {text:'월드컵재단 운영 심층조사',status:0}
+  ],preps:[
+    {text:'감사 대상 기관 현황자료 수집',status:0},
+    {text:'질의서 초안 작성',status:0}
+  ]},
+  {id:'a6',year:1,cat:'budget',title:'2027년도 예산심의',date:'2026.12월 제394회',status:0,tasks:[],preps:[]},
+  {id:'a7',year:2,cat:'bill',title:'2호 조례 (차후 선정)',date:'2027.11월 정례회',status:0,tasks:[],preps:[]},
+  {id:'a8',year:2,cat:'speech',title:'5분발언',date:'2027.9월',status:0,tasks:[],preps:[]},
+  {id:'a9',year:2,cat:'speech',title:'대집행부질의',date:'2027.11월 정례회',status:0,tasks:[],preps:[]},
+  {id:'a10',year:2,cat:'audit',title:'2027년 행정사무감사',date:'2027.11월',status:0,tasks:[],preps:[]},
+  {id:'a11',year:2,cat:'budget',title:'2028년도 예산심의',date:'2027.12월',status:0,tasks:[],preps:[]},
+  {id:'a12',year:2,cat:'budget',title:'2027년도 결산심의',date:'2028.6월',status:0,tasks:[],preps:[]},
+],
+research:[
+  {id:'r1',title:'전국체전 사립대 시설 개보수 예산 검증',cat:'audit',status:0,tasks:[
+    {text:'개보수 대상 35개 시설 중 사립대 3곳(장안대·수원대·용인대) 예산 내역 분리',status:0},
+    {text:'사유시설 공공예산 투입 법적 근거(지방재정법·체육진흥기금) 자료 요구',status:0},
+    {text:'체전 종료 후 시설 주민 개방 협약(MOU) 유무 확인',status:0},
+    {text:'타 시도 전국체전 사립대 시설 지원 사례 비교 조사',status:0},
+    {text:'설계·공사 추진 현황 점검 -- 특혜성 지원 여부 검증',status:0}
+  ]},
+  {id:'r2',title:'의료웰니스관광 사업 실효성 검토',cat:'audit',status:0,tasks:[
+    {text:'실적 506명 진료과목별(가정의학과·일반진료 vs 고의료수가) 세부 분류 요구',status:0},
+    {text:'환자 1인당 예산 가성비 분석',status:0},
+    {text:'서울 집중 구조에서 경기도 유치 실효성 문제점 도출',status:0},
+    {text:'타 지자체(부산·인천 등) 의료관광 모델 비교',status:0},
+    {text:'경기도 특화 웰니스 자원(한방·리조트·산림치유) 연계 재설계안',status:0}
+  ]},
+  {id:'r3',title:'경기도수원월드컵경기장관리재단 심층조사',cat:'audit',status:0,tasks:[
+    {text:'최근 5개년 보도자료·지역일보 기사 전수 수집',status:0},
+    {text:'감사원·경기도 감사위원회 과거 감사결과 처분요구서 분석',status:0},
+    {text:'본부장 업무추진비 카드사용 내역(일시·장소·사유) 자료 요구',status:0},
+    {text:'관용차량 운행일지·하이패스 내역 요구',status:0},
+    {text:'최근 3개년 채용·승진·퇴사 현황 및 퇴사 사유 수집',status:0},
+    {text:'수의계약 체결 현황 -- 특정 업체 연속 계약 여부 점검',status:0},
+    {text:'노동조합 비공식 간담회 -- 부조리·인력 배치 실태 수집',status:0},
+    {text:'익명 제보 채널(이메일/구글 폼) 마련',status:0}
+  ]},
+  {id:'r4',title:'장애인체육회 포상금 과세 정상화',cat:'research',status:0,tasks:[
+    {text:'소득세법 시행령 §87 필요경비 80% 적용 법리 검토',status:0},
+    {text:'경기도장애인체육회 국세청 서면질의 신청 추진 상태 확인',status:0},
+    {text:'유권해석 확보 후 2024년 이후 과다 원천징수 환급 절차 이행 요구',status:0},
+    {text:'(차선) 세액보전수당 신설 또는 포상금 예산 기준액 인상안',status:0}
+  ]},
 ],
 pledges:[
-  {id:'p1',title:'중장년 역량강화 모델 구축',status:0,link:'평생학습(55.8억), 문화일자리(23.3억), 아카데미 운영(5.5억)',body:'중장년 문화예술 활동 지원 조례 제정으로 법적 기반|경기도 평생교육진흥원 중장년 특화 프로그램 확대|문화일자리 사업 중장년 참여 비율 확대|세대 간 문화 교류 프로그램 개발'},
-  {id:'p2',title:'AI 시대 직업전환 교육 체계',status:0,link:'평생교육진흥 조례 개정, 콘텐츠 인력양성, 디지털 교육',body:'평생교육진흥 조례 개정으로 AI 교육 지원 근거|콘텐츠진흥원 인력양성 프로그램 중장년 확대|온라인·혼합형 학습 인프라 활용 직업 역량 교육'},
-  {id:'p3',title:'경력단절여성 문화일자리 지원',status:0,link:'문화일자리(23.3억), 문화예술진흥 조례 개정',body:'문화예술진흥 조례에 경력단절여성 우선 참여 근거|문화예술·콘텐츠 분야 재취업 지원 프로그램|경력단절여성 지원 관련 조례 2차년도 개정'},
-  {id:'p4',title:'데이터 기반 문화정책 수립',status:0,link:'도민 문화향유 실태조사, 문화지표, 문화영향평가',body:'데이터 기반 문화정책 수립 지원 조례 제정 (2차년도)|문화향유 실태조사 정례화 및 정책 환류 체계|문체국 사업 성과측정 데이터 체계 구축'},
+  {id:'p1',title:'중장년 역량강화 모델 구축',status:0,link:'평생학습(55.8억), 문화일자리(23.3억), 아카데미 운영(5.5억)',tasks:[
+    {text:'중장년 문화예술 활동 지원 조례 제정으로 법적 기반',status:0},
+    {text:'경기도 평생교육진흥원 중장년 특화 프로그램 확대',status:0},
+    {text:'문화일자리 사업 중장년 참여 비율 확대',status:0},
+    {text:'세대 간 문화 교류 프로그램 개발',status:0}
+  ]},
+  {id:'p2',title:'AI 시대 직업전환 교육 체계',status:0,link:'평생교육진흥 조례 개정, 콘텐츠 인력양성, 디지털 교육',tasks:[
+    {text:'평생교육진흥 조례 개정으로 AI 교육 지원 근거',status:0},
+    {text:'콘텐츠진흥원 인력양성 프로그램 중장년 확대',status:0},
+    {text:'온라인·혼합형 학습 인프라 활용 직업 역량 교육',status:0}
+  ]},
+  {id:'p3',title:'경력단절여성 문화일자리 지원',status:0,link:'문화일자리(23.3억), 문화예술진흥 조례 개정',tasks:[
+    {text:'문화예술진흥 조례에 경력단절여성 우선 참여 근거',status:0},
+    {text:'문화예술·콘텐츠 분야 재취업 지원 프로그램',status:0},
+    {text:'경력단절여성 지원 관련 조례 2차년도 개정',status:0}
+  ]},
+  {id:'p4',title:'데이터 기반 문화정책 수립',status:0,link:'도민 문화향유 실태조사, 문화지표, 문화영향평가',tasks:[
+    {text:'데이터 기반 문화정책 수립 지원 조례 제정 (2차년도)',status:0},
+    {text:'문화향유 실태조사 정례화 및 정책 환류 체계',status:0},
+    {text:'문체국 사업 성과측정 데이터 체계 구축',status:0}
+  ]},
 ],
 /* 선거공약 상태 (분야별 16개 + 대상별 12개 = 28개, 각각 별도 관리) */
 elecField:Array(16).fill(0),
@@ -283,28 +356,28 @@ elecTarget:Array(12).fill(0),
 schedule:[
   {id:'s1',date:'2026.7',session:'제392회',cat:'임시회',text:'개원·상임위 구성, 업무보고, 문체국 현황 파악',status:0},
   {id:'s2',date:'2026.8',session:'비회기',cat:'조례 준비',text:'중장년 문화예술 조례 비교법제, 실태조사',status:0},
-  {id:'s3',date:'2026.9',session:'제393회',cat:'5분발언①',text:'중장년 문화일자리, 경기도가 선도해야',status:0},
+  {id:'s3',date:'2026.9',session:'제393회',cat:'5분발언',text:'중장년 문화일자리, 경기도가 선도해야',status:0},
   {id:'s4',date:'',session:'',cat:'질의 준비',text:'문화일자리·평생학습 자료 수집, 질의서 초안',status:0},
   {id:'s5',date:'2026.10',session:'비회기',cat:'감사 준비',text:'공공기관 현황자료, 중장년 문화단체 간담회',status:0},
   {id:'s6',date:'2026.11',session:'제394회',cat:'조례 제정',text:'중장년 문화예술 활동 지원 조례 발의',status:0},
   {id:'s7',date:'',session:'',cat:'대집행부질의',text:'문화정책 중장년·취약계층 포용성 질의',status:0},
   {id:'s8',date:'',session:'',cat:'행정사무감사',text:'문화재단·평생교육진흥원 등 6개 기관',status:0},
   {id:'s9',date:'2026.12',session:'제394회',cat:'예산심의',text:'2027년도 예산안 심의 (중장년 문화·AI 교육 등)',status:0},
-  {id:'s10',date:'2027.2',session:'임시회',cat:'개정조례①',text:'평생교육진흥 조례 개정 (AI 직업전환 지원)',status:0},
-  {id:'s11',date:'',session:'',cat:'5분발언②',text:'AI 시대, 경기도 평생학습이 달라져야',status:0},
-  {id:'s12',date:'2027.4',session:'임시회',cat:'개정조례②',text:'문화예술진흥 조례 개정 (경력단절여성 지원)',status:0},
+  {id:'s10',date:'2027.2',session:'임시회',cat:'개정조례',text:'평생교육진흥 조례 개정 (AI 직업전환 지원)',status:0},
+  {id:'s11',date:'',session:'',cat:'5분발언',text:'AI 시대, 경기도 평생학습이 달라져야',status:0},
+  {id:'s12',date:'2027.4',session:'임시회',cat:'개정조례',text:'문화예술진흥 조례 개정 (경력단절여성 지원)',status:0},
   {id:'s13',date:'2027.6',session:'정례회',cat:'결산 심의',text:'2026년도 결산, 추경예산안 심의',status:0},
-  {id:'s_div',date:'',session:'',cat:'__divider__',text:'── 2차년도 ──',status:-1},
+  {id:'s_div',date:'',session:'',cat:'__divider__',text:'-- 2차년도 --',status:-1},
   {id:'s14',date:'2027.7',session:'임시회',cat:'업무보고',text:'문체국 2차년도 업무보고, 전국체전 최종 준비 점검',status:0},
-  {id:'s15',date:'2027.9',session:'임시회',cat:'5분발언③',text:'전국체전 이후 경기도 체육 문화 활용 제언',status:0},
-  {id:'s16',date:'',session:'',cat:'개정조례①',text:'경력단절여성 지원 조례 개정',status:0},
+  {id:'s15',date:'2027.9',session:'임시회',cat:'5분발언',text:'전국체전 이후 경기도 체육 문화 활용 제언',status:0},
+  {id:'s16',date:'',session:'',cat:'개정조례',text:'경력단절여성 지원 조례 개정',status:0},
   {id:'s17',date:'2027.10',session:'비회기',cat:'전국체전',text:'제108회 전국체전 개최 (10.8~14, 경기도)',status:0},
   {id:'s18',date:'2027.11',session:'정례회',cat:'조례 제정',text:'데이터 기반 문화정책 수립 지원 조례 발의',status:0},
   {id:'s19',date:'',session:'',cat:'대집행부질의',text:'전국체전 이후 체육·문화 인프라 지속가능 질의',status:0},
   {id:'s20',date:'',session:'',cat:'행정사무감사',text:'전국체전 집행·중장년 문화 조례·AI 교육 감사',status:0},
   {id:'s21',date:'2027.12',session:'정례회',cat:'예산심의',text:'2028년도 예산안 심의',status:0},
-  {id:'s22',date:'2028.2',session:'임시회',cat:'개정조례②',text:'중장년 문화예술 조례 보완 개정',status:0},
-  {id:'s23',date:'',session:'',cat:'5분발언④',text:'데이터 기반 문화정책 1년 성과, 전반기 총정리',status:0},
+  {id:'s22',date:'2028.2',session:'임시회',cat:'개정조례',text:'중장년 문화예술 조례 보완 개정',status:0},
+  {id:'s23',date:'',session:'',cat:'5분발언',text:'데이터 기반 문화정책 1년 성과, 전반기 총정리',status:0},
   {id:'s24',date:'2028.6',session:'정례회',cat:'결산·마무리',text:'2027년도 결산, 전반기 의정활동 성과 정리',status:0},
 ],
 };
@@ -315,18 +388,21 @@ function loadData(){
   catch(e){data=JSON.parse(JSON.stringify(DEFAULT))}
   if(!data.elecField) data.elecField=Array(16).fill(0);
   if(!data.elecTarget) data.elecTarget=Array(12).fill(0);
-  /* migrate old body string → tasks array (activities) */
+  /* migrate old body string -> tasks array (activities) */
   data.activities.forEach(a=>{
     if(typeof a.body==='string'){const sep=a.body.includes('|')?'|':'\n';a.tasks=a.body.split(sep).filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.body}
     if(!a.tasks) a.tasks=[];
     if(typeof a.details==='string'){a.preps=a.details.split('|').filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.details}
     if(!a.preps) a.preps=[];
   });
-  /* migrate old body string → tasks array (pledges) */
+  /* migrate old body string -> tasks array (pledges) */
   data.pledges.forEach(pl=>{
     if(typeof pl.body==='string'){pl.tasks=pl.body.split('|').filter(Boolean).map(t=>({text:t,status:0}));delete pl.body}
     if(!pl.tasks) pl.tasks=[];
   });
+  /* migrate research array */
+  if(!data.research) data.research=[];
+  data.research.forEach(r=>{if(!r.tasks)r.tasks=[]});
 }
 function saveData(){data._ts=Date.now();localStorage.setItem(STORAGE,JSON.stringify(data));debouncedPush()}
 function resetAll(){if(confirm('모든 편집 내용을 초기 상태로 되돌리시겠습니까?')){localStorage.removeItem(STORAGE);loadData();renderAll()}}
@@ -364,8 +440,8 @@ function makeEditable(text,onSave){const el=document.createElement('span');el.te
 function deleteItem(arr,idx){if(confirm('이 항목을 삭제하시겠습니까?')){arr.splice(idx,1);saveData();renderAll()}}
 
 /* ===== ADD ===== */
-function addActivity(year){data.activities.push({id:genId(),year,cat:'etc',title:'새 항목',date:'시기 입력',status:0,tasks:[],preps:[]});saveData();renderAll();showTab(1)}
-function addPledge(){data.pledges.push({id:genId(),title:'새 공약',status:0,link:'연계 사업 입력',tasks:[{text:'할 일 입력',status:0}]});saveData();renderAll();showTab(2)}
+function addActivity(year){data.activities.push({id:genId(),year,cat:'bill',title:'새 항목',date:'시기 입력',status:0,tasks:[],preps:[]});saveData();renderAll();showTab(1)}
+function addPledge(){data.pledges.push({id:genId(),title:'새 공약',status:0,link:'연계 사업 입력',tasks:[{text:'할 일 입력',status:0}]});saveData();renderAll();showTab(3)}
 function cyclePledgeTask(pi,ti){data.pledges[pi].tasks[ti].status=(data.pledges[pi].tasks[ti].status+1)%3;saveData();renderAll()}
 function addPledgeTask(pi){data.pledges[pi].tasks.push({text:'새 할일',status:0});saveData();renderPledges()}
 function deletePledgeTask(pi,ti){if(confirm('이 할일을 삭제하시겠습니까?')){data.pledges[pi].tasks.splice(ti,1);saveData();renderPledges()}}
@@ -375,7 +451,13 @@ function deleteActTask(ai,ti){if(confirm('삭제하시겠습니까?')){data.acti
 function cycleActPrep(ai,ti){data.activities[ai].preps[ti].status=(data.activities[ai].preps[ti].status+1)%3;saveData();renderAll()}
 function addActPrep(ai){data.activities[ai].preps.push({text:'새 준비사항',status:0});saveData();renderActivities()}
 function deleteActPrep(ai,ti){if(confirm('삭제하시겠습니까?')){data.activities[ai].preps.splice(ti,1);saveData();renderActivities()}}
-function addSchedule(){data.schedule.push({id:genId(),date:'시기',session:'회기',cat:'구분',text:'내용 입력',status:0});saveData();renderAll();showTab(3)}
+function addSchedule(){data.schedule.push({id:genId(),date:'시기',session:'회기',cat:'구분',text:'내용 입력',status:0});saveData();renderAll();showTab(4)}
+
+/* ===== RESEARCH FUNCTIONS ===== */
+function cycleResearchTask(ri,ti){data.research[ri].tasks[ti].status=(data.research[ri].tasks[ti].status+1)%3;saveData();renderResearch()}
+function addResearchTask(ri){data.research[ri].tasks.push({text:'새 조사항목',status:0});saveData();renderResearch()}
+function deleteResearchTask(ri,ti){if(confirm('삭제하시겠습니까?')){data.research[ri].tasks.splice(ti,1);saveData();renderResearch()}}
+function addResearchItem(){data.research.push({id:genId(),title:'새 조사 안건',cat:'audit',status:0,tasks:[]});saveData();renderResearch();showTab(2)}
 
 /* ===== RENDER HELPERS ===== */
 function bulletHTML(text){if(!text)return '';const items=text.split('|').filter(Boolean);return '<ul class="bl">'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>'}
@@ -403,11 +485,11 @@ function elecStats(){
 /* ===== RENDER: DASHBOARD ===== */
 function renderDashboard(){
   const p=document.getElementById('panel-0');
-  const count=(arr,catPrefix)=>{let d=0,t=0;arr.forEach(i=>{if(typeof catPrefix==='function'?catPrefix(i):true){t++;if(i.status===2)d++}});return{d,t}};
+  const count=(arr,catFilter)=>{let d=0,t=0;arr.forEach(i=>{if(typeof catFilter==='function'?catFilter(i):true){t++;if(i.status===2)d++}});return{d,t}};
   const bills=count(data.activities,i=>i.cat==='bill');
-  const amends=count(data.activities,i=>i.cat==='amend');
+  const audits=count(data.activities,i=>i.cat==='audit');
   const speeches=count(data.activities,i=>i.cat==='speech');
-  const queries=count(data.activities,i=>i.cat==='query');
+  const researchItems=count(data.activities,i=>i.cat==='research');
   const keyPledges=(()=>{let d=0,t=0;data.pledges.forEach(p=>(p.tasks||[]).forEach(tk=>{t++;if(tk.status===2)d++}));return{d,t}})();
   const actStats=(()=>{let d=0,t=0;data.activities.forEach(a=>{(a.tasks||[]).forEach(tk=>{t++;if(tk.status===2)d++});(a.preps||[]).forEach(tk=>{t++;if(tk.status===2)d++})});return{d,t}})();
   const pct=actStats.t?Math.round(actStats.d/actStats.t*100):0;
@@ -416,24 +498,28 @@ function renderDashboard(){
   const es=elecStats();
   const epct=es.tt?Math.round(es.td/es.tt*100):0;
 
+  const researchStats=(()=>{let d=0,t=0;data.research.forEach(r=>r.tasks.forEach(tk=>{t++;if(tk.status===2)d++}));return{d,t}})();
+  const rpct=researchStats.t?Math.round(researchStats.d/researchStats.t*100):0;
+
   const sorted=sortByDate(data.activities.filter(a=>a.status<2));
   const upcoming=sorted.slice(0,1);
-  const nextText=upcoming.length?'<strong>'+escHtml(upcoming[0].date)+'</strong> — '+escHtml(upcoming[0].title):'모든 활동 완료!';
+  const nextText=upcoming.length?'<strong>'+escHtml(upcoming[0].date)+'</strong> -- '+escHtml(upcoming[0].title):'모든 활동 완료!';
 
   p.innerHTML=`
-    <div class="next-alert"><span style="font-size:20px">🔔</span><div class="text">다음 예정: ${nextText}</div></div>
+    <div class="next-alert"><div class="text">다음 예정: ${nextText}</div></div>
     <div class="metric-row">
-      <div class="metric"><div class="metric-label">조례 제정</div><div class="metric-val">${bills.d} <span>/ ${bills.t}</span></div></div>
-      <div class="metric"><div class="metric-label">조례 개정</div><div class="metric-val">${amends.d} <span>/ ${amends.t}</span></div></div>
-      <div class="metric"><div class="metric-label">5분발언</div><div class="metric-val">${speeches.d} <span>/ ${speeches.t}</span></div></div>
-      <div class="metric"><div class="metric-label">대집행부질의</div><div class="metric-val">${queries.d} <span>/ ${queries.t}</span></div></div>
+      <div class="metric"><div class="metric-label">조례</div><div class="metric-val">${bills.d} <span>/ ${bills.t}</span></div></div>
+      <div class="metric"><div class="metric-label">행정사무감사</div><div class="metric-val">${audits.d} <span>/ ${audits.t}</span></div></div>
+      <div class="metric"><div class="metric-label">발언·질의</div><div class="metric-val">${speeches.d} <span>/ ${speeches.t}</span></div></div>
+      <div class="metric"><div class="metric-label">정보수집</div><div class="metric-val">${researchItems.d} <span>/ ${researchItems.t}</span></div></div>
     </div>
-    <div class="card"><div class="card-title">📈 전체 의정활동 진행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-text">전체 ${actStats.t}개 항목 중 ${actStats.d}개 완료 (${pct}%)</div></div></div>
+    <div class="card"><div class="card-title">전체 의정활동 진행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-text">전체 ${actStats.t}개 항목 중 ${actStats.d}개 완료 (${pct}%)</div></div></div>
+    <div class="card"><div class="card-title">조사·분석 진행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${rpct}%;background:var(--amber)"></div></div><div class="prog-text">${researchStats.t}개 조사항목 중 ${researchStats.d}개 완료 (${rpct}%)</div></div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="card"><div class="card-title">📋 일반공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${epct}%;background:var(--acc)"></div></div><div class="prog-text">${es.tt}개 선거공약 중 ${es.td}개 완료 (${epct}%)</div></div></div>
-      <div class="card"><div class="card-title">⭐ 핵심공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${kpct}%;background:var(--green)"></div></div><div class="prog-text">${keyPledges.t}개 핵심공약 중 ${keyPledges.d}개 완료 (${kpct}%)</div></div></div>
+      <div class="card"><div class="card-title">일반공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${epct}%;background:var(--acc)"></div></div><div class="prog-text">${es.tt}개 선거공약 중 ${es.td}개 완료 (${epct}%)</div></div></div>
+      <div class="card"><div class="card-title">핵심공약 이행률</div><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${kpct}%;background:var(--green)"></div></div><div class="prog-text">${keyPledges.t}개 핵심공약 중 ${keyPledges.d}개 완료 (${kpct}%)</div></div></div>
     </div>
-    <div class="section-title">📌 주요 예정 활동</div>
+    <div class="section-title">주요 예정 활동</div>
     ${sorted.slice(0,8).map(a=>`<div class="card" style="padding:12px 20px"><div style="display:flex;align-items:center;justify-content:space-between"><div><span style="font-size:12px;color:var(--sec);font-weight:600">${escHtml(a.date)}</span> <span style="font-size:13px;color:#444;margin-left:8px">${escHtml(a.title)}</span></div><span class="badge ${statusClass[a.status]}" style="cursor:default;font-size:10px">${statusCycle[a.status]}</span></div></div>`).join('')}
   `;
 }
@@ -443,7 +529,7 @@ function renderActivities(){
   const p=document.getElementById('panel-1');
   let html='';
   [1,2].forEach(yr=>{
-    html+=`<div class="section-title">${yr===1?'📘':'📙'} ${yr}차년도 (${yr===1?'2026.7 ~ 2027.6':'2027.7 ~ 2028.6'})</div>`;
+    html+=`<div class="section-title">${yr}차년도 (${yr===1?'2026.7 ~ 2027.6':'2027.7 ~ 2028.6'})</div>`;
     const items=data.activities.filter(a=>a.year===yr);
     const cats=[...new Set(items.map(a=>a.cat))];
     cats.forEach(cat=>{
@@ -451,38 +537,83 @@ function renderActivities(){
       items.filter(a=>a.cat===cat).forEach((a,ci)=>{
         const gIdx=data.activities.indexOf(a);
         const tasksHtml=(a.tasks||[]).map((t,ti)=>{
-          const st=t.status;const stIcon=st===2?'✓':st===1?'●':'';
+          const st=t.status;const stIcon=st===2?'V':st===1?'*':'';
           return `<div class="acc-item">
             <div class="acc-st s${st}" onclick="cycleActTask(${gIdx},${ti})">${stIcon}</div>
             <span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}" ${editMode?'contenteditable="true" onblur="data.activities['+gIdx+'].tasks['+ti+'].text=this.textContent.trim();saveData()"':''}>${escHtml(t.text)}</span>
-            ${editMode?'<span class="small-del" onclick="deleteActTask('+gIdx+','+ti+')">✕</span>':''}
+            ${editMode?'<span class="small-del" onclick="deleteActTask('+gIdx+','+ti+')">X</span>':''}
           </div>`}).join('');
         const hasPreps=a.preps&&a.preps.length>0;
         const prepsListHtml=(a.preps||[]).map((t,ti)=>{
-          const st=t.status;const stIcon=st===2?'✓':st===1?'●':'';
+          const st=t.status;const stIcon=st===2?'V':st===1?'*':'';
           return `<div class="acc-item">
             <div class="acc-st s${st}" onclick="cycleActPrep(${gIdx},${ti})">${stIcon}</div>
             <span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}" ${editMode?'contenteditable="true" onblur="data.activities['+gIdx+'].preps['+ti+'].text=this.textContent.trim();saveData()"':''}>${escHtml(t.text)}</span>
-            ${editMode?'<span class="small-del" onclick="deleteActPrep('+gIdx+','+ti+')">✕</span>':''}
+            ${editMode?'<span class="small-del" onclick="deleteActPrep('+gIdx+','+ti+')">X</span>':''}
           </div>`}).join('');
-        const prepsAddBtn=editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addActPrep('+gIdx+')">＋ 준비사항 추가</button></div>':'';
+        const prepsAddBtn=editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addActPrep('+gIdx+')">+ 준비사항 추가</button></div>':'';
         const prepsHtml=(hasPreps||editMode)?'<details style="margin-top:8px"'+(editMode?' open':'')+'>'+
           '<summary style="font-size:12px;color:var(--sec);cursor:pointer;font-weight:500">준비사항 ('+(a.preps?a.preps.length:0)+')</summary>'+
           prepsListHtml+prepsAddBtn+'</details>':'';
         html+=`<div class="card" draggable="${editMode}" ondragstart="dragStart(event,data.activities,${gIdx})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,data.activities,${gIdx})">
-          <span class="grip" draggable="false">⠿</span>
-          <button class="del-btn" onclick="deleteItem(data.activities,${gIdx})">✕</button>
+          <span class="grip" draggable="false">:::</span>
+          <button class="del-btn" onclick="deleteItem(data.activities,${gIdx})">X</button>
           <div class="card-title"><span class="badge ${statusClass[a.status]}" onclick="cycleStatus(data.activities,${gIdx})">${statusCycle[a.status]}</span> <span ${editMode?'contenteditable="true" onblur="data.activities['+gIdx+'].title=this.textContent.trim();saveData()"':''}>${escHtml(a.title)}</span></div>
-          <div class="card-body"><strong>시기:</strong> <span ${editMode?'contenteditable="true" onblur="data.activities['+gIdx+'].date=this.textContent.trim();saveData()"':''}>${escHtml(a.date)}</span><br>${tasksHtml}${editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addActTask('+gIdx+')">＋ 할일 추가</button></div>':''}${prepsHtml}</div>
+          <div class="card-body"><strong>시기:</strong> <span ${editMode?'contenteditable="true" onblur="data.activities['+gIdx+'].date=this.textContent.trim();saveData()"':''}>${escHtml(a.date)}</span><br>${tasksHtml}${editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addActTask('+gIdx+')">+ 할일 추가</button></div>':''}${prepsHtml}</div>
         </div>`;
       });
     });
-    html+=`<button class="add-btn" onclick="addActivity(${yr})">＋ ${yr}차년도 항목 추가</button>`;
+    html+=`<button class="add-btn" onclick="addActivity(${yr})">+ ${yr}차년도 항목 추가</button>`;
   });
   p.innerHTML=html;
 }
 
-/* ===== RENDER: PLEDGES (개편) ===== */
+/* ===== RENDER: RESEARCH ===== */
+function renderResearch(){
+  const p=document.getElementById('panel-2');
+  let html='<div class="section-title">조사·분석 현황</div>';
+
+  const totalTasks=data.research.reduce((s,r)=>s+r.tasks.length,0);
+  const doneTasks=data.research.reduce((s,r)=>s+r.tasks.filter(t=>t.status===2).length,0);
+  const pct=totalTasks?Math.round(doneTasks/totalTasks*100):0;
+  html+=`<div class="card" style="margin-bottom:20px"><div class="card-body"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-text">전체 ${totalTasks}개 조사항목 중 ${doneTasks}개 완료 (${pct}%)</div></div></div>`;
+
+  data.research.forEach((r,ri)=>{
+    const done=r.tasks.filter(t=>t.status===2).length;
+    const prog=r.tasks.filter(t=>t.status===1).length;
+    const total=r.tasks.length;
+    const catLabel=r.cat==='audit'?'행정사무감사':'정보수집';
+
+    html+=`<div class="card" style="border-left:4px solid ${r.cat==='audit'?'var(--sec)':'var(--amber)'}">
+      <button class="del-btn" onclick="deleteItem(data.research,${ri})">X</button>
+      <div class="card-title">
+        <span class="badge ${statusClass[r.status]}" onclick="cycleStatus(data.research,${ri})">${statusCycle[r.status]}</span>
+        <span ${editMode?'contenteditable="true" onblur="data.research['+ri+'].title=this.textContent.trim();saveData()"':''}>${escHtml(r.title)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--gr);margin-bottom:8px">${catLabel} / ${done}/${total} 완료</div>
+      <div class="card-body">`;
+
+    r.tasks.forEach((t,ti)=>{
+      const st=t.status;const stIcon=st===2?'V':st===1?'*':'';
+      html+=`<div class="acc-item">
+        <div class="acc-st s${st}" onclick="cycleResearchTask(${ri},${ti})">${stIcon}</div>
+        <span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}" ${editMode?'contenteditable="true" onblur="data.research['+ri+'].tasks['+ti+'].text=this.textContent.trim();saveData()"':''}>${escHtml(t.text)}</span>
+        ${editMode?'<span class="small-del" onclick="deleteResearchTask('+ri+','+ti+')">X</span>':''}
+      </div>`;
+    });
+
+    if(editMode){
+      html+=`<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addResearchTask(${ri})">+ 조사항목 추가</button></div>`;
+    }
+
+    html+=`</div></div>`;
+  });
+
+  html+=`<button class="add-btn" onclick="addResearchItem()">+ 조사 안건 추가</button>`;
+  p.innerHTML=html;
+}
+
+/* ===== RENDER: PLEDGES ===== */
 let openAccIdx={};
 function toggleAcc(key){openAccIdx[key]=!openAccIdx[key];renderPledges()}
 
@@ -500,13 +631,13 @@ function renderElecAccordion(groups,stateArr,type){
     html+=`<div class="acc-group ${isOpen?'open':''}">
       <div class="acc-header" onclick="toggleAcc('${key}')">
         <div class="acc-left">
-          <span class="acc-icon">${g.icon}</span>
+          ${g.icon?'<span class="acc-icon">'+g.icon+'</span>':''}
           <span class="acc-name">${escHtml(g.cat)}</span>
           <span class="acc-cnt">${total}개</span>
         </div>
         <div class="acc-right">
           <span class="acc-ratio" style="${ratioStyle}">${done}/${total}</span>
-          <span class="acc-arrow">▼</span>
+          <span class="acc-arrow">V</span>
         </div>
       </div>
       <div class="acc-body">`;
@@ -514,7 +645,7 @@ function renderElecAccordion(groups,stateArr,type){
     g.items.forEach((item,i)=>{
       const idx=startIdx+i;
       const st=stateArr[idx];
-      const stIcon=st===2?'✓':st===1?'●':'';
+      const stIcon=st===2?'V':st===1?'*':'';
       html+=`<div class="acc-item">
         <div class="acc-st s${st}" onclick="cycleElec('${type}',${idx})" title="클릭하여 상태 변경">${stIcon}</div>
         <span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}">${escHtml(item)}</span>
@@ -527,12 +658,12 @@ function renderElecAccordion(groups,stateArr,type){
 }
 
 function renderPledges(){
-  const p=document.getElementById('panel-2');
+  const p=document.getElementById('panel-3');
   let html='<div class="pledge-layout">';
 
-  /* 왼쪽: 선거 공약 전체 */
+  /* left: election pledges */
   html+='<div>';
-  html+='<div class="section-title" style="margin-top:0">📋 선거 공약 이행현황</div>';
+  html+='<div class="section-title" style="margin-top:0">선거 공약 이행현황</div>';
   html+=`<div class="pledge-view-toggle">
     <div class="pledge-view-btn ${pledgeView==='field'?'active':''}" onclick="pledgeView='field';renderPledges()">분야별 보기</div>
     <div class="pledge-view-btn ${pledgeView==='target'?'active':''}" onclick="pledgeView='target';renderPledges()">대상별 보기</div>
@@ -545,29 +676,29 @@ function renderPledges(){
   }
   html+='</div>';
 
-  /* 오른쪽: 핵심 공약 */
+  /* right: key pledges */
   html+='<div>';
-  html+='<div class="section-title" style="margin-top:0">⭐ 핵심공약 이행현황</div>';
+  html+='<div class="section-title" style="margin-top:0">핵심공약 이행현황</div>';
   data.pledges.forEach((pl,i)=>{
     html+=`<div class="card" draggable="${editMode}" ondragstart="dragStart(event,data.pledges,${i})" ondragend="dragEnd(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,data.pledges,${i})">
-      <span class="grip" draggable="false">⠿</span>
-      <button class="del-btn" onclick="deleteItem(data.pledges,${i})">✕</button>
+      <span class="grip" draggable="false">:::</span>
+      <button class="del-btn" onclick="deleteItem(data.pledges,${i})">X</button>
       <div class="card-title"><span class="badge ${statusClass[pl.status]}" onclick="cycleStatus(data.pledges,${i})">${statusCycle[pl.status]}</span> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].title=this.textContent.trim();saveData()"':''}>${escHtml(pl.title)}</span></div>
-      <div class="card-body"><strong>▶ 문체위 연계:</strong> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].link=this.textContent.trim();saveData()"':''}>${escHtml(pl.link)}</span>
+      <div class="card-body"><strong>문체위 연계:</strong> <span ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].link=this.textContent.trim();saveData()"':''}>${escHtml(pl.link)}</span>
         <div style="margin-top:8px">
         ${(pl.tasks||[]).map((t,ti)=>{
-          const st=t.status;const stIcon=st===2?'✓':st===1?'●':'';
+          const st=t.status;const stIcon=st===2?'V':st===1?'*':'';
           return `<div class="acc-item">
             <div class="acc-st s${st}" onclick="cyclePledgeTask(${i},${ti})" title="클릭하여 상태 변경">${stIcon}</div>
             <span style="${st===2?'text-decoration:line-through;color:var(--gr)':''}" ${editMode?'contenteditable="true" onblur="data.pledges['+i+'].tasks['+ti+'].text=this.textContent.trim();saveData()"':''}>${escHtml(t.text)}</span>
-            ${editMode?'<span style="margin-left:auto;color:var(--red);cursor:pointer;font-size:12px;flex-shrink:0" onclick="deletePledgeTask('+i+','+ti+')">✕</span>':''}
+            ${editMode?'<span style="margin-left:auto;color:var(--red);cursor:pointer;font-size:12px;flex-shrink:0" onclick="deletePledgeTask('+i+','+ti+')">X</span>':''}
           </div>`}).join('')}
-        ${editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addPledgeTask('+i+')">＋ 할일 추가</button></div>':''}
+        ${editMode?'<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addPledgeTask('+i+')">+ 할일 추가</button></div>':''}
         </div>
       </div>
     </div>`;
   });
-  html+='<button class="add-btn" onclick="addPledge()">＋ 핵심공약 추가</button>';
+  html+='<button class="add-btn" onclick="addPledge()">+ 핵심공약 추가</button>';
   html+='</div>';
 
   html+='</div>';
@@ -599,7 +730,7 @@ function renderCalendar(){
   OVERLAY.forEach(([s,e,label,cls,pri])=>{if(e<mStart||s>mEnd)return;const ds=s<mStart?1:(s%100),de=e>mEnd?dim:((Math.floor(e/100)%100===calMonth)?e%100:dim);for(let d=ds;d<=de;d++) add(d,d===ds?label:'',cls,pri)});
   sortByDate(data.schedule.filter(s=>s.cat!=='__divider__')).forEach(s=>{const pd=parseSchedDate(s.date);if(!pd||pd.y!==calYear||pd.m!==calMonth)return;add(pd.d||1,s.cat,'st'+s.status,5)});
   function inSess(d){const dn=ymd(calYear,calMonth,d);return SESS.some(([s,e])=>dn>=s&&dn<=e)}
-  let html='<div class="cal-wrap"><div class="cal-nav"><button onclick="calPrev()">◀</button><span class="cal-month">'+calYear+'년 '+calMonth+'월</span><button onclick="calNext()">▶</button></div><div class="cal-grid">';
+  let html='<div class="cal-wrap"><div class="cal-nav"><button onclick="calPrev()"><</button><span class="cal-month">'+calYear+'년 '+calMonth+'월</span><button onclick="calNext()">></button></div><div class="cal-grid">';
   ['일','월','화','수','목','금','토'].forEach((dn,di)=>html+=`<div class="cal-hdr${di===0?' sun':''}${di===6?' sat':''}">${dn}</div>`);
   for(let i=startDow-1;i>=0;i--) html+=`<div class="cal-cell other"><div class="cal-day">${prevDays-i}</div></div>`;
   for(let d=1;d<=dim;d++){const dow=(startDow+d-1)%7;let cls='cal-cell';if(calYear===tY&&calMonth===tM&&d===tD)cls+=' today';if(dow===0)cls+=' sun';if(dow===6)cls+=' sat';if(inSess(d))cls+=' in-session';html+=`<div class="${cls}"><div class="cal-day">${d}</div>`;if(evts[d]){const sorted=evts[d].sort((a,b)=>a.pri-b.pri);sorted.slice(0,4).forEach(ev=>{if(ev.text)html+=`<div class="cal-evt ${ev.cls}" title="${escHtml(ev.text)}">${escHtml(ev.text)}</div>`;else html+=`<div class="cal-evt ${ev.cls} cal-bar"></div>`});if(sorted.length>4)html+=`<div class="cal-more">+${sorted.length-4}</div>`}html+='</div>'}
@@ -612,7 +743,7 @@ function renderCalendar(){
 
 /* ===== RENDER: SCHEDULE ===== */
 function renderSchedule(){
-  const p=document.getElementById('panel-3');let rows='';
+  const p=document.getElementById('panel-4');let rows='';
   const dividerIdx=data.schedule.findIndex(s=>s.cat==='__divider__');
   const divider=dividerIdx>=0?data.schedule[dividerIdx]:null;
   const nonDiv=data.schedule.filter(s=>s.cat!=='__divider__');
@@ -631,23 +762,23 @@ function renderSchedule(){
     const origIdx=data.schedule.indexOf(s);
     if(s.cat==='__divider__'){rows+=`<tr class="divider-row"><td colspan="${editMode?'7':'5'}">${escHtml(s.text)}</td></tr>`;return}
     rows+=`<tr draggable="${editMode}" ondragstart="rowDragStart(event,${origIdx})" ondragend="rowDragEnd(event)" ondragover="rowDragOver(event)" ondrop="rowDrop(event,${origIdx})">
-      ${editMode?'<td class="grip-cell" style="display:table-cell">⠿</td>':''}
+      ${editMode?'<td class="grip-cell" style="display:table-cell">:::</td>':''}
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+origIdx+'].date=this.textContent.trim();saveData();renderSchedule()"':''}>${escHtml(s.date)}</td>
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+origIdx+'].session=this.textContent.trim();saveData()"':''}>${escHtml(s.session)}</td>
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+origIdx+'].cat=this.textContent.trim();saveData()"':''}>${escHtml(s.cat)}</td>
       <td ${editMode?'contenteditable="true" onblur="data.schedule['+origIdx+'].text=this.textContent.trim();saveData()"':''}>${escHtml(s.text)}</td>
       <td><span class="badge ${statusClass[s.status]}" onclick="cycleStatus(data.schedule,${origIdx})">${statusCycle[s.status]}</span></td>
-      ${editMode?'<td class="del-cell" style="display:table-cell" onclick="deleteItem(data.schedule,'+origIdx+')">🗑</td>':''}
+      ${editMode?'<td class="del-cell" style="display:table-cell" onclick="deleteItem(data.schedule,'+origIdx+')">X</td>':''}
     </tr>`});
-  p.innerHTML=`<div class="section-title">📅 전반기 의정활동 일정표</div>${renderCalendar()}<div class="section-title" style="margin-top:32px">📋 일정 상세 목록</div>
+  p.innerHTML=`<div class="section-title">전반기 의정활동 일정표</div>${renderCalendar()}<div class="section-title" style="margin-top:32px">일정 상세 목록</div>
     <table class="tbl"><thead><tr>${editMode?'<th style="width:40px"></th>':''}<th style="width:80px">시기</th><th style="width:80px">회기</th><th style="width:110px">구분</th><th>주요 내용</th><th style="width:60px">상태</th>${editMode?'<th style="width:40px"></th>':''}</tr></thead><tbody>${rows}</tbody></table>
-    <button class="add-btn" onclick="addSchedule()">＋ 일정 추가</button>`;
+    <button class="add-btn" onclick="addSchedule()">+ 일정 추가</button>`;
 }
 
 /* ===== RENDER: PROFILE ===== */
 function renderProfile(){
-  document.getElementById('panel-4').innerHTML=`
-    <div class="section-title">👤 의원 프로필</div>
+  document.getElementById('panel-5').innerHTML=`
+    <div class="section-title">의원 프로필</div>
     <table class="prof-tbl">
       <tr><th>성명</th><td>이미정 (李美貞, LEE MI JEONG)</td></tr>
       <tr><th>생년월일</th><td>1981. 7. 26. (45세)</td></tr>
@@ -661,7 +792,7 @@ function renderProfile(){
     <ul class="bl"><li>수원대학교 경영학 학사·석사·박사</li></ul>
     <div class="sub-title">주요 경력</div>
     <ul class="bl"><li>(현) 수원대학교 창업지원단 주임교수</li><li>(현) 중소벤처기업부 비즈니스지원단 전문위원</li><li>(전) 경기도경제과학진흥원 경영혁신 컨설턴트</li><li>(전) 중소기업 경영컨설팅 다수</li></ul>
-    <div class="section-title">🔗 문체국 주요사업 연계 분석</div>
+    <div class="section-title">문체국 주요사업 연계 분석</div>
     <div class="card"><div class="card-title">1. 경기도민 평생학습 (평생교육과, 55.8억)</div><div class="card-body"><strong>현황:</strong> 평생교육진흥원 운영, 온라인 학습 인프라<br><strong>연계점:</strong> 중장년 AI·디지털 직업전환 교육, 온라인 평생학습 확대</div></div>
     <div class="card"><div class="card-title">2. 문화일자리 사업 (문화예술과, 23.3억)</div><div class="card-body"><strong>현황:</strong> 문화예술 분야 일자리 창출<br><strong>연계점:</strong> 중장년·경력단절여성 문화일자리 참여 확대</div></div>
     <div class="card"><div class="card-title">3. 아카데미 운영 (문화예술과, 5.5억)</div><div class="card-body"><strong>현황:</strong> 시민 대상 문화예술 교육<br><strong>연계점:</strong> 중장년 맞춤형 문화예술 아카데미 과정 개발</div></div>
@@ -672,7 +803,7 @@ function renderProfile(){
 }
 
 /* ===== RENDER ALL ===== */
-function renderAll(){renderDashboard();renderActivities();renderPledges();renderSchedule();renderProfile()}
+function renderAll(){renderDashboard();renderActivities();renderResearch();renderPledges();renderSchedule();renderProfile()}
 loadData();renderAll();pullFromGist();
 </script>
 </body>
