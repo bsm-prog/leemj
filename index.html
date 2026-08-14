@@ -650,6 +650,21 @@ function renderResearch(){
       html+=`<div style="text-align:center;margin-top:4px"><button style="background:transparent;border:1px dashed var(--acc);color:var(--acc);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px" onclick="addResearchTask(${ri})">+ 조사항목 추가</button></div>`;
     }
 
+
+    /* links section */
+    if(r.links && r.links.length > 0){
+      html+=`<div class="res-links"><div class="res-links-title">📎 첨부 자료 링크</div>`;
+      r.links.forEach((lnk,li)=>{
+        html+=`<div class="res-link-item"><span style="font-size:11px;color:var(--gr)">•</span><a href="${escHtml(lnk.url)}" target="_blank" rel="noopener">${escHtml(lnk.title)}</a>`;
+        if(editMode) html+=`<button class="res-link-del" onclick="deleteResearchLink(${ri},${li})">X</button>`;
+        html+=`</div>`;
+      });
+      if(editMode) html+=`<button class="res-link-add" onclick="addResearchLink(${ri})">📎 + 자료 링크 추가</button>`;
+      html+=`</div>`;
+    } else if(editMode){
+      html+=`<div class="res-links"><button class="res-link-add" onclick="addResearchLink(${ri})">📎 + 자료 링크 추가</button></div>`;
+    }
+
     html+=`</div></div>`;
   });
 
