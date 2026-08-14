@@ -181,6 +181,17 @@ body.edit-mode .small-del{display:inline-block}
 .media-qlink{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:var(--lbg);color:var(--sec);border-radius:20px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid transparent;transition:all .15s}
 .media-qlink:hover{background:var(--wh);border-color:var(--sec)}
 .media-count{font-size:12px;color:var(--gr);margin:12px 0 8px;font-weight:500}
+
+/* Research Links */
+.res-links{margin-top:10px;border-top:1px dashed var(--bd);padding-top:8px}
+.res-links-title{font-size:11px;color:var(--gr);font-weight:600;margin-bottom:6px}
+.res-link-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.res-link-item a{font-size:12px;color:var(--sec);text-decoration:none;word-break:break-all;flex:1}
+.res-link-item a:hover{text-decoration:underline}
+.res-link-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:4px}
+.res-link-del:hover{background:var(--red-bg)}
+.res-link-add{background:transparent;border:1px dashed var(--sec);color:var(--sec);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11px;margin-top:4px}
+.res-link-add:hover{background:var(--lbg)}
 </style>
 </head>
 <body>
@@ -251,7 +262,7 @@ async function pullFromGist(){const token=getToken();if(!token){setSyncStatus('o
       data.activities.forEach(a=>{if(typeof a.body==='string'){const sep=a.body.includes('|')?'|':'\n';a.tasks=a.body.split(sep).filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.body};if(!a.tasks)a.tasks=[];if(typeof a.details==='string'){a.preps=a.details.split('|').filter(s=>s.trim()).map(t=>({text:t.trim(),status:0}));delete a.details};if(!a.preps)a.preps=[]});
       data.pledges.forEach(pl=>{if(typeof pl.body==='string'){pl.tasks=pl.body.split('|').filter(Boolean).map(t=>({text:t,status:0}));delete pl.body};if(!pl.tasks)pl.tasks=[]});
       if(!data.research) data.research=[];
-      data.research.forEach(r=>{if(!r.tasks)r.tasks=[]});
+      data.research.forEach(r=>{if(!r.tasks)r.tasks=[];if(!r.links)r.links=[]});
       localStorage.setItem(STORAGE,JSON.stringify(data));renderAll();setSyncStatus('synced','클라우드에서 불러옴')}
     else{setSyncStatus('synced','동기화됨');if(localTs>0&&remoteTs<localTs)debouncedPush()}
   }catch(e){setSyncStatus('error','연결 오류')}}
@@ -424,7 +435,7 @@ function loadData(){
   });
   /* migrate research array */
   if(!data.research) data.research=[];
-  data.research.forEach(r=>{if(!r.tasks)r.tasks=[]});
+  data.research.forEach(r=>{if(!r.tasks)r.tasks=[];if(!r.links)r.links=[]});
 }
 function saveData(){data._ts=Date.now();localStorage.setItem(STORAGE,JSON.stringify(data));debouncedPush()}
 function resetAll(){if(confirm('모든 편집 내용을 초기 상태로 되돌리시겠습니까?')){localStorage.removeItem(STORAGE);loadData();renderAll()}}
@@ -479,7 +490,18 @@ function addSchedule(){data.schedule.push({id:genId(),date:'시기',session:'회
 function cycleResearchTask(ri,ti){data.research[ri].tasks[ti].status=(data.research[ri].tasks[ti].status+1)%3;saveData();renderResearch()}
 function addResearchTask(ri){data.research[ri].tasks.push({text:'새 조사항목',status:0});saveData();renderResearch()}
 function deleteResearchTask(ri,ti){if(confirm('삭제하시겠습니까?')){data.research[ri].tasks.splice(ti,1);saveData();renderResearch()}}
-function addResearchItem(){data.research.push({id:genId(),title:'새 조사 안건',cat:'audit',status:0,tasks:[]});saveData();renderResearch();showTab(4)}
+
+function addResearchLink(ri){
+  var title=prompt('자료 제목을 입력하세요 (예: 관련 보고서)');
+  if(!title)return;
+  var url=prompt('URL을 입력하세요 (예: https://drive.google.com/...)');
+  if(!url)return;
+  if(!url.startsWith('http'))url='https://'+url;
+  data.research[ri].links.push({title:title,url:url});
+  saveData();renderResearch();
+}
+function deleteResearchLink(ri,li){if(confirm('이 링크를 삭제하시겠습니까?')){data.research[ri].links.splice(li,1);saveData();renderResearch()}}
+function addResearchItem(){data.research.push({id:genId(),title:'새 조사 안건',cat:'audit',status:0,tasks:[],links:[]});saveData();renderResearch();showTab(4)}
 
 /* ===== RENDER HELPERS ===== */
 function bulletHTML(text){if(!text)return '';const items=text.split('|').filter(Boolean);return '<ul class="bl">'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>'}
